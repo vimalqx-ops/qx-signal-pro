@@ -45,58 +45,74 @@
         </div>
       </div>
 
-      <!-- Controls: Pair, Timeframe, Generate -->
+      <!-- Controls: Pair & Timeframe Only (Generate Signal moved below) -->
       <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
         <button id="openPairModalBtn" type="button" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sm font-semibold text-white">
-          <span id="activePairLabel">EUR/USD (OTC)</span>
+          <span id="activePairLabel">AUD/NZD (OTC)</span>
           <span class="text-xs text-emerald-400">&#9662; Pair</span>
         </button>
 
-        <div class="flex items-center gap-2">
-          <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-800">
-            <button id="tf1mBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950">
-              1m
-            </button>
-            <button id="tf5mBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white">
-              5m
-            </button>
-          </div>
-
-          <button id="generateSignalBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm transition">
-            Generate Signal
+        <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-800">
+          <button id="tf1mBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950">
+            1m
+          </button>
+          <button id="tf5mBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white">
+            5m
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Active Signal Card -->
-    <section class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">ACTIVE SIGNAL</div>
-          <div id="signalDirectionText" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-0.5">
-            PUT (DOWN)
-          </div>
-          <div id="signalSubtext" class="text-xs text-slate-300 mt-1">
-            கீழே செல்லும் (Sell / Lower) &bull; <span id="signalPairAndTf">EUR/USD (OTC) &bull; 1m</span>
-          </div>
-        </div>
+    <!-- Signal Card Area: Shows Generate Signal when idle/expired, or Active Signal when running -->
+    <section id="signalSectionCard" class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
-          <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
-          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">01:00</div>
-          <div class="text-[11px] text-emerald-400 mt-0.5">
-            AI Accuracy: <span id="signalAccuracyText">88%</span>
-          </div>
+      <!-- Idle / Expired State (Generate Signal Button Here) -->
+      <div id="idleSignalState" class="py-4 text-center space-y-3">
+        <div id="idleStatusLabel" class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+          SIGNAL READY
+        </div>
+        <h2 id="idleTitleText" class="text-lg sm:text-xl font-bold text-white">
+          Signal generate seiya keela ulla button-ai tap pannungal
+        </h2>
+        <p id="idleDescText" class="text-xs text-slate-400 max-w-md mx-auto">
+          Pair matrum timeframe (1m / 5m) select seithu Generate Signal tap pannal mattume signal varum.
+        </p>
+        <div class="pt-1">
+          <button id="generateSignalBtn" type="button" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
+            Generate Signal
+          </button>
         </div>
       </div>
 
-      <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
-        EUR/USD (OTC) (1m) — Support / rejection confirmation paartthu mattum entry edungal. Sudden spike / news nerangalil trade thavirkka.
-      </p>
+      <!-- Active Signal State -->
+      <div id="activeSignalState" class="hidden space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">ACTIVE SIGNAL</div>
+            <div id="signalDirectionText" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-0.5">
+              PUT (DOWN)
+            </div>
+            <div id="signalSubtext" class="text-xs text-slate-300 mt-1">
+              கீழே செல்லும் (Sell / Lower) &bull; <span id="signalPairAndTf">AUD/NZD (OTC) &bull; 1m</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
+            <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
+            <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">01:00</div>
+            <div class="text-[11px] text-emerald-400 mt-0.5">
+              AI Accuracy: <span id="signalAccuracyText">88%</span>
+            </div>
+          </div>
+        </div>
+
+        <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+          AUD/NZD (OTC) (1m) — Resistance / bearish rejection confirmation paartthu mattum PUT entry edungal. Sudden spike / news nerangalil trade thavirkka.
+        </p>
+      </div>
 
       <!-- Indicators -->
-      <div class="grid grid-cols-3 gap-2.5">
+      <div class="grid grid-cols-3 gap-2.5 pt-1">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">RSI (14)</div>
           <div id="indicatorRsiValue" class="text-base font-bold text-white mt-0.5">72.4</div>
@@ -107,7 +123,7 @@
 
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">EMA (9/21)</div>
-          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross</div>
+          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross (DOWN)</div>
           <div id="indicatorEmaSpread" class="text-[11px] font-mono text-slate-400 mt-1">-0.00012</div>
         </div>
 
@@ -126,7 +142,7 @@
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="chartTitleText" class="text-sm sm:text-base font-bold text-white">
-            EUR/USD (OTC) - Live Price Action
+            AUD/NZD (OTC) - Live Price Action
           </h2>
           <p class="text-[11px] text-slate-400">
             நிகழ்நேர மெழுகுவர்த்தி வரைபடம் (Simulated Candlestick + EMA 9 Indicator)
@@ -137,7 +153,7 @@
             1m View
           </span>
           <span id="domLiveSpotPrice" class="font-mono text-sm font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-            1.08497
+            1.21826
           </span>
         </div>
       </div>
@@ -172,7 +188,7 @@
         </button>
       </div>
 
-      <input id="pairSearchInput" type="text" placeholder="Search pair (e.g. EUR/USD, GBP/JPY, OTC, BTC, Gold)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400" />
+      <input id="pairSearchInput" type="text" placeholder="Search pair (e.g. AUD/NZD, EUR/USD, OTC, BTC, Gold)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400" />
 
       <div class="flex flex-wrap gap-1.5 text-[11px]">
         <button type="button" data-cat="ALL" class="cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-emerald-500 text-slate-950">All</button>
@@ -188,24 +204,46 @@
   <script>
     (function () {
       var PAIRS = [
+        { symbol: 'AUD/NZD (OTC)', cat: 'OTC', basePrice: 1.21826, decimals: 5, volatility: 0.00050 },
         { symbol: 'EUR/USD (OTC)', cat: 'OTC', basePrice: 1.08497, decimals: 5, volatility: 0.00045 },
         { symbol: 'GBP/USD (OTC)', cat: 'OTC', basePrice: 1.26840, decimals: 5, volatility: 0.00052 },
         { symbol: 'USD/JPY (OTC)', cat: 'OTC', basePrice: 154.320, decimals: 3, volatility: 0.085 },
+        { symbol: 'USD/CHF (OTC)', cat: 'OTC', basePrice: 0.88240, decimals: 5, volatility: 0.00044 },
+        { symbol: 'USD/CAD (OTC)', cat: 'OTC', basePrice: 1.39910, decimals: 5, volatility: 0.00046 },
+        { symbol: 'AUD/USD (OTC)', cat: 'OTC', basePrice: 0.65280, decimals: 5, volatility: 0.00044 },
+        { symbol: 'NZD/USD (OTC)', cat: 'OTC', basePrice: 0.59140, decimals: 5, volatility: 0.00042 },
         { symbol: 'EUR/JPY (OTC)', cat: 'OTC', basePrice: 167.410, decimals: 3, volatility: 0.095 },
         { symbol: 'GBP/JPY (OTC)', cat: 'OTC', basePrice: 195.740, decimals: 3, volatility: 0.110 },
         { symbol: 'AUD/CAD (OTC)', cat: 'OTC', basePrice: 0.90412, decimals: 5, volatility: 0.00048 },
         { symbol: 'AUD/CHF (OTC)', cat: 'OTC', basePrice: 0.57380, decimals: 5, volatility: 0.00038 },
         { symbol: 'AUD/JPY (OTC)', cat: 'OTC', basePrice: 100.520, decimals: 3, volatility: 0.068 },
         { symbol: 'CAD/CHF (OTC)', cat: 'OTC', basePrice: 0.63450, decimals: 5, volatility: 0.00040 },
+        { symbol: 'CAD/JPY (OTC)', cat: 'OTC', basePrice: 110.310, decimals: 3, volatility: 0.075 },
         { symbol: 'CHF/JPY (OTC)', cat: 'OTC', basePrice: 174.980, decimals: 3, volatility: 0.105 },
+        { symbol: 'EUR/AUD (OTC)', cat: 'OTC', basePrice: 1.66290, decimals: 5, volatility: 0.00065 },
+        { symbol: 'EUR/CAD (OTC)', cat: 'OTC', basePrice: 1.51840, decimals: 5, volatility: 0.00060 },
         { symbol: 'EUR/CHF (OTC)', cat: 'OTC', basePrice: 0.95620, decimals: 5, volatility: 0.00036 },
         { symbol: 'EUR/GBP (OTC)', cat: 'OTC', basePrice: 0.85520, decimals: 5, volatility: 0.00038 },
+        { symbol: 'EUR/NZD (OTC)', cat: 'OTC', basePrice: 1.83420, decimals: 5, volatility: 0.00072 },
+        { symbol: 'GBP/AUD (OTC)', cat: 'OTC', basePrice: 1.94480, decimals: 5, volatility: 0.00075 },
         { symbol: 'GBP/CAD (OTC)', cat: 'OTC', basePrice: 1.76890, decimals: 5, volatility: 0.00065 },
-        { symbol: 'NZD/USD (OTC)', cat: 'OTC', basePrice: 0.59140, decimals: 5, volatility: 0.00042 },
+        { symbol: 'GBP/CHF (OTC)', cat: 'OTC', basePrice: 1.11940, decimals: 5, volatility: 0.00050 },
+        { symbol: 'GBP/NZD (OTC)', cat: 'OTC', basePrice: 2.14560, decimals: 5, volatility: 0.00085 },
+        { symbol: 'NZD/CAD (OTC)', cat: 'OTC', basePrice: 0.82730, decimals: 5, volatility: 0.00044 },
+        { symbol: 'NZD/CHF (OTC)', cat: 'OTC', basePrice: 0.52190, decimals: 5, volatility: 0.00036 },
+        { symbol: 'NZD/JPY (OTC)', cat: 'OTC', basePrice: 91.240, decimals: 3, volatility: 0.062 },
         { symbol: 'USD/BRL (OTC)', cat: 'OTC', basePrice: 5.81420, decimals: 5, volatility: 0.00320 },
         { symbol: 'USD/MXN (OTC)', cat: 'OTC', basePrice: 20.34800, decimals: 5, volatility: 0.01200 },
         { symbol: 'USD/ARS (OTC)', cat: 'OTC', basePrice: 1004.500, decimals: 3, volatility: 0.450 },
         { symbol: 'USD/TRY (OTC)', cat: 'OTC', basePrice: 34.56200, decimals: 5, volatility: 0.01800 },
+        { symbol: 'USD/INR (OTC)', cat: 'OTC', basePrice: 84.42000, decimals: 5, volatility: 0.02500 },
+        { symbol: 'USD/SGD (OTC)', cat: 'OTC', basePrice: 1.34520, decimals: 5, volatility: 0.00045 },
+        { symbol: 'USD/PHP (OTC)', cat: 'OTC', basePrice: 58.92000, decimals: 5, volatility: 0.01500 },
+        { symbol: 'USD/EGP (OTC)', cat: 'OTC', basePrice: 49.64000, decimals: 5, volatility: 0.01800 },
+        { symbol: 'XAU/USD (OTC)', cat: 'OTC', basePrice: 2649.20, decimals: 2, volatility: 1.55 },
+        { symbol: 'BTC/USD (OTC)', cat: 'OTC', basePrice: 91520.00, decimals: 2, volatility: 70.0 },
+        { symbol: 'DOGE/USD (OTC)', cat: 'OTC', basePrice: 0.39850, decimals: 5, volatility: 0.00220 },
+        { symbol: 'AUD/NZD', cat: 'FOREX', basePrice: 1.10240, decimals: 5, volatility: 0.00046 },
         { symbol: 'EUR/USD', cat: 'FOREX', basePrice: 1.08520, decimals: 5, volatility: 0.00042 },
         { symbol: 'GBP/USD', cat: 'FOREX', basePrice: 1.26910, decimals: 5, volatility: 0.00048 },
         { symbol: 'USD/JPY', cat: 'FOREX', basePrice: 154.180, decimals: 3, volatility: 0.080 },
@@ -218,22 +256,33 @@
         { symbol: 'EUR/GBP', cat: 'FOREX', basePrice: 0.85510, decimals: 5, volatility: 0.00035 },
         { symbol: 'EUR/AUD', cat: 'FOREX', basePrice: 1.66340, decimals: 5, volatility: 0.00062 },
         { symbol: 'EUR/CAD', cat: 'FOREX', basePrice: 1.51780, decimals: 5, volatility: 0.00058 },
+        { symbol: 'EUR/CHF', cat: 'FOREX', basePrice: 0.95600, decimals: 5, volatility: 0.00035 },
+        { symbol: 'EUR/NZD', cat: 'FOREX', basePrice: 1.83380, decimals: 5, volatility: 0.00068 },
         { symbol: 'GBP/AUD', cat: 'FOREX', basePrice: 1.94520, decimals: 5, volatility: 0.00072 },
+        { symbol: 'GBP/CAD', cat: 'FOREX', basePrice: 1.76820, decimals: 5, volatility: 0.00062 },
+        { symbol: 'GBP/CHF', cat: 'FOREX', basePrice: 1.11910, decimals: 5, volatility: 0.00048 },
+        { symbol: 'GBP/NZD', cat: 'FOREX', basePrice: 2.14490, decimals: 5, volatility: 0.00080 },
         { symbol: 'AUD/CAD', cat: 'FOREX', basePrice: 0.91240, decimals: 5, volatility: 0.00042 },
+        { symbol: 'AUD/CHF', cat: 'FOREX', basePrice: 0.57530, decimals: 5, volatility: 0.00036 },
         { symbol: 'AUD/JPY', cat: 'FOREX', basePrice: 100.580, decimals: 3, volatility: 0.065 },
+        { symbol: 'CAD/CHF', cat: 'FOREX', basePrice: 0.63050, decimals: 5, volatility: 0.00038 },
         { symbol: 'CAD/JPY', cat: 'FOREX', basePrice: 110.220, decimals: 3, volatility: 0.072 },
+        { symbol: 'CHF/JPY', cat: 'FOREX', basePrice: 174.820, decimals: 3, volatility: 0.098 },
+        { symbol: 'NZD/CAD', cat: 'FOREX', basePrice: 0.82750, decimals: 5, volatility: 0.00042 },
+        { symbol: 'NZD/CHF', cat: 'FOREX', basePrice: 0.52180, decimals: 5, volatility: 0.00035 },
+        { symbol: 'NZD/JPY', cat: 'FOREX', basePrice: 91.210, decimals: 3, volatility: 0.060 },
         { symbol: 'XAU/USD (Gold)', cat: 'CRYPTO_CMD', basePrice: 2648.50, decimals: 2, volatility: 1.45 },
-        { symbol: 'XAU/USD (OTC)', cat: 'OTC', basePrice: 2649.20, decimals: 2, volatility: 1.55 },
         { symbol: 'XAG/USD (Silver)', cat: 'CRYPTO_CMD', basePrice: 30.640, decimals: 3, volatility: 0.045 },
         { symbol: 'UKBrent Crude', cat: 'CRYPTO_CMD', basePrice: 73.420, decimals: 3, volatility: 0.085 },
         { symbol: 'USCrude WTI', cat: 'CRYPTO_CMD', basePrice: 69.850, decimals: 3, volatility: 0.082 },
+        { symbol: 'Natural Gas', cat: 'CRYPTO_CMD', basePrice: 3.185, decimals: 3, volatility: 0.025 },
         { symbol: 'BTC/USD', cat: 'CRYPTO_CMD', basePrice: 91450.00, decimals: 2, volatility: 65.0 },
-        { symbol: 'BTC/USD (OTC)', cat: 'OTC', basePrice: 91520.00, decimals: 2, volatility: 70.0 },
         { symbol: 'ETH/USD', cat: 'CRYPTO_CMD', basePrice: 3340.50, decimals: 2, volatility: 4.20 },
         { symbol: 'LTC/USD', cat: 'CRYPTO_CMD', basePrice: 88.400, decimals: 3, volatility: 0.180 },
         { symbol: 'XRP/USD', cat: 'CRYPTO_CMD', basePrice: 1.42500, decimals: 5, volatility: 0.00650 },
         { symbol: 'SOL/USD', cat: 'CRYPTO_CMD', basePrice: 238.600, decimals: 3, volatility: 0.450 },
-        { symbol: 'DOGE/USD (OTC)', cat: 'OTC', basePrice: 0.39850, decimals: 5, volatility: 0.00220 }
+        { symbol: 'BNB/USD', cat: 'CRYPTO_CMD', basePrice: 618.400, decimals: 3, volatility: 1.150 },
+        { symbol: 'ADA/USD', cat: 'CRYPTO_CMD', basePrice: 0.94200, decimals: 5, volatility: 0.00520 }
       ];
 
       function getDurationForTimeframe(tf) {
@@ -244,9 +293,11 @@
         selectedPair: PAIRS[0],
         selectedCategory: 'ALL',
         timeframe: '1m',
+        signalActive: false,
+        justExpired: false,
         direction: 'PUT',
         accuracy: 88,
-        countdownSec: 60,
+        countdownSec: 0,
         lastTickSec: null,
         candles: [],
         history: []
@@ -263,6 +314,11 @@
         activePairLabel: document.getElementById('activePairLabel'),
         tf1mBtn: document.getElementById('tf1mBtn'),
         tf5mBtn: document.getElementById('tf5mBtn'),
+        idleSignalState: document.getElementById('idleSignalState'),
+        idleStatusLabel: document.getElementById('idleStatusLabel'),
+        idleTitleText: document.getElementById('idleTitleText'),
+        idleDescText: document.getElementById('idleDescText'),
+        activeSignalState: document.getElementById('activeSignalState'),
         generateSignalBtn: document.getElementById('generateSignalBtn'),
         signalDirectionText: document.getElementById('signalDirectionText'),
         signalSubtext: document.getElementById('signalSubtext'),
@@ -465,6 +521,26 @@
       }
 
       function renderSignalCard() {
+        if (!state.signalActive) {
+          if (el.activeSignalState) el.activeSignalState.classList.add('hidden');
+          if (el.idleSignalState) el.idleSignalState.classList.remove('hidden');
+          if (el.idleStatusLabel) {
+            el.idleStatusLabel.textContent = state.justExpired ? 'SIGNAL EXPIRED' : 'SIGNAL READY';
+          }
+          if (el.idleTitleText) {
+            el.idleTitleText.textContent = state.justExpired
+              ? 'Signal expire aagivittathu — pudhiya signal generate seiya tap pannungal'
+              : 'Signal generate seiya keela ulla button-ai tap pannungal';
+          }
+          if (el.idleDescText) {
+            el.idleDescText.textContent = state.selectedPair.symbol + ' (' + state.timeframe + ') — Generate Signal tap pannal mattume signal varum.';
+          }
+          return;
+        }
+
+        if (el.idleSignalState) el.idleSignalState.classList.add('hidden');
+        if (el.activeSignalState) el.activeSignalState.classList.remove('hidden');
+
         var isCall = state.direction === 'CALL';
         if (el.signalDirectionText) {
           el.signalDirectionText.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
@@ -523,6 +599,8 @@
           ? Math.floor(84 + Math.random() * 9)
           : Math.floor(78 + Math.random() * 11);
         state.countdownSec = getDurationForTimeframe(state.timeframe);
+        state.signalActive = true;
+        state.justExpired = false;
 
         var timeStr = updateIstClock(Date.now());
         state.history.unshift({
@@ -539,14 +617,16 @@
 
       function handleSetTimeframe(tf) {
         state.timeframe = tf;
-        state.countdownSec = getDurationForTimeframe(tf);
+        if (state.signalActive) {
+          state.countdownSec = getDurationForTimeframe(tf);
+        }
         if (el.tf1mBtn && el.tf5mBtn) {
           if (tf === '1m') {
-            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
-            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+            el.tf1mBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+            el.tf5mBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
           } else {
-            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
-            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+            el.tf1mBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+            el.tf5mBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
           }
         }
         seedCandles(state.selectedPair);
@@ -673,10 +753,14 @@
           state.lastTickSec = wholeSec;
 
           for (var step = 0; step < elapsed; step++) {
-            if (state.countdownSec > 1) {
-              state.countdownSec -= 1;
-            } else {
-              state.countdownSec = getDurationForTimeframe(state.timeframe);
+            if (state.signalActive) {
+              if (state.countdownSec > 1) {
+                state.countdownSec -= 1;
+              } else {
+                state.countdownSec = 0;
+                state.signalActive = false;
+                state.justExpired = true;
+              }
             }
             stepCandle();
           }
