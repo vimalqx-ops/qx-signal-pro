@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QX Signal Pro - Quotex Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
+      font-family: 'Inter', sans-serif;
       background-color: #070b14;
       color: #f8fafc;
     }
@@ -45,7 +45,7 @@
         </div>
       </div>
 
-      <!-- Controls: Pair & Timeframe Only (Generate Signal moved below) -->
+      <!-- Controls: Pair & Timeframe Only -->
       <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
         <button id="openPairModalBtn" type="button" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sm font-semibold text-white">
           <span id="activePairLabel">AUD/NZD (OTC)</span>
@@ -63,19 +63,19 @@
       </div>
     </header>
 
-    <!-- Signal Card Area: Shows Generate Signal when idle/expired, or Active Signal when running -->
+    <!-- Signal Card Area -->
     <section id="signalSectionCard" class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
 
-      <!-- Idle / Expired State (Generate Signal Button Here) -->
+      <!-- Idle / Expired State -->
       <div id="idleSignalState" class="py-4 text-center space-y-3">
         <div id="idleStatusLabel" class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
           SIGNAL READY
         </div>
         <h2 id="idleTitleText" class="text-lg sm:text-xl font-bold text-white">
-          Signal generate seiya keela ulla button-ai tap pannungal
+          Tap Generate Signal to analyze market setup
         </h2>
         <p id="idleDescText" class="text-xs text-slate-400 max-w-md mx-auto">
-          Pair matrum timeframe (1m / 5m) select seithu Generate Signal tap pannal mattume signal varum.
+          Select a Quotex pair and timeframe (1m or 5m), then tap Generate Signal to view direction and accuracy.
         </p>
         <div class="pt-1">
           <button id="generateSignalBtn" type="button" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition">
@@ -93,25 +93,37 @@
               PUT (DOWN)
             </div>
             <div id="signalSubtext" class="text-xs text-slate-300 mt-1">
-              கீழே செல்லும் (Sell / Lower) &bull; <span id="signalPairAndTf">AUD/NZD (OTC) &bull; 1m</span>
+              Sell / Lower Direction &bull; <span id="signalPairAndTf">AUD/NZD (OTC) &bull; 1m</span>
             </div>
           </div>
 
-          <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
-            <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[165px]">
+            <div class="text-[11px] text-slate-400">Entry Starts In</div>
             <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">01:00</div>
             <div class="text-[11px] text-emerald-400 mt-0.5">
-              AI Accuracy: <span id="signalAccuracyText">88%</span>
+              Signal Accuracy: <span id="signalAccuracyText" class="font-bold">88%</span>
             </div>
           </div>
         </div>
 
-        <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
-          AUD/NZD (OTC) (1m) — Resistance / bearish rejection confirmation paartthu mattum PUT entry edungal. Sudden spike / news nerangalil trade thavirkka.
-        </p>
+        <!-- Signal Accuracy Meter -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-200">Signal Accuracy Confidence</span>
+            <span id="accuracyBadgeText" class="font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              88% - High Confidence
+            </span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+            <div id="accuracyProgressBar" class="h-full rounded-full bg-emerald-400 transition-all duration-300" style="width: 88%;"></div>
+          </div>
+          <p id="signalConfirmationNote" class="text-xs text-slate-300 pt-0.5">
+            Confirm candle close and price rejection on Quotex before placing a trade. Avoid high-impact news and sudden spikes.
+          </p>
+        </div>
       </div>
 
-      <!-- Indicators -->
+      <!-- Technical Indicators -->
       <div class="grid grid-cols-3 gap-2.5 pt-1">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">RSI (14)</div>
@@ -145,7 +157,7 @@
             AUD/NZD (OTC) - Live Price Action
           </h2>
           <p class="text-[11px] text-slate-400">
-            நிகழ்நேர மெழுகுவர்த்தி வரைபடம் (Simulated Candlestick + EMA 9 Indicator)
+            Simulated Candlestick + EMA 9 Indicator
           </p>
         </div>
         <div class="flex items-center gap-2">
@@ -164,12 +176,12 @@
     <!-- History Section -->
     <section class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-bold text-white">Recent Signals / சமீபத்திய சிக்னல்கள்</h2>
+        <h2 class="text-sm font-bold text-white">Recent Signals</h2>
         <span id="historyCountBadge" class="text-xs text-slate-400">0 entries</span>
       </div>
       <div id="signalHistoryList" class="space-y-2 text-xs">
         <div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">
-          Puthiya signal generate seithal ingu patthivagum.
+          Generated signals will appear here.
         </div>
       </div>
     </section>
@@ -289,6 +301,12 @@
         return tf === '5m' ? 300 : 60;
       }
 
+      function getAccuracyLabel(acc) {
+        if (acc >= 88) return acc + '% - High Accuracy';
+        if (acc >= 80) return acc + '% - Good Accuracy';
+        return acc + '% - Moderate Accuracy';
+      }
+
       var state = {
         selectedPair: PAIRS[0],
         selectedCategory: 'ALL',
@@ -324,6 +342,8 @@
         signalSubtext: document.getElementById('signalSubtext'),
         expiryCountdownDisplay: document.getElementById('expiryCountdownDisplay'),
         signalAccuracyText: document.getElementById('signalAccuracyText'),
+        accuracyBadgeText: document.getElementById('accuracyBadgeText'),
+        accuracyProgressBar: document.getElementById('accuracyProgressBar'),
         signalConfirmationNote: document.getElementById('signalConfirmationNote'),
         rsiVal: document.getElementById('indicatorRsiValue'),
         rsiStatus: document.getElementById('indicatorRsiStatus'),
@@ -529,11 +549,11 @@
           }
           if (el.idleTitleText) {
             el.idleTitleText.textContent = state.justExpired
-              ? 'Signal expire aagivittathu — pudhiya signal generate seiya tap pannungal'
-              : 'Signal generate seiya keela ulla button-ai tap pannungal';
+              ? 'Signal expired — tap Generate Signal for a new setup'
+              : 'Tap Generate Signal to analyze market setup';
           }
           if (el.idleDescText) {
-            el.idleDescText.textContent = state.selectedPair.symbol + ' (' + state.timeframe + ') — Generate Signal tap pannal mattume signal varum.';
+            el.idleDescText.textContent = state.selectedPair.symbol + ' (' + state.timeframe + ') — Tap Generate Signal to see direction and accuracy.';
           }
           return;
         }
@@ -547,7 +567,7 @@
           el.signalDirectionText.className = 'text-2xl sm:text-3xl font-extrabold mt-0.5 ' + (isCall ? 'text-emerald-400' : 'text-rose-400');
         }
         if (el.signalSubtext) {
-          var desc = isCall ? 'மேலே செல்லும் (Buy / Higher)' : 'கீழே செல்லும் (Sell / Lower)';
+          var desc = isCall ? 'Buy / Higher Direction' : 'Sell / Lower Direction';
           el.signalSubtext.innerHTML = desc + ' &bull; <span id="signalPairAndTf">' + state.selectedPair.symbol + ' &bull; ' + state.timeframe + '</span>';
         }
         if (el.expiryCountdownDisplay) {
@@ -556,10 +576,16 @@
         if (el.signalAccuracyText) {
           el.signalAccuracyText.textContent = state.accuracy + '%';
         }
+        if (el.accuracyBadgeText) {
+          el.accuracyBadgeText.textContent = getAccuracyLabel(state.accuracy);
+        }
+        if (el.accuracyProgressBar) {
+          el.accuracyProgressBar.style.width = Math.min(100, Math.max(10, state.accuracy)) + '%';
+        }
         if (el.signalConfirmationNote) {
           el.signalConfirmationNote.textContent = isCall
-            ? state.selectedPair.symbol + ' (' + state.timeframe + ') — Support / bullish rejection confirmation paartthu mattum CALL entry edungal. Sudden spike / news nerangalil trade thavirkka.'
-            : state.selectedPair.symbol + ' (' + state.timeframe + ') — Resistance / bearish rejection confirmation paartthu mattum PUT entry edungal. Sudden spike / news nerangalil trade thavirkka.';
+            ? state.selectedPair.symbol + ' (' + state.timeframe + ') — Estimated accuracy is ' + state.accuracy + '%. Enter CALL only after support/bullish rejection confirmation.'
+            : state.selectedPair.symbol + ' (' + state.timeframe + ') — Estimated accuracy is ' + state.accuracy + '%. Enter PUT only after resistance/bearish rejection confirmation.';
         }
       }
 
@@ -569,7 +595,7 @@
         }
         if (!el.historyList) return;
         if (!state.history.length) {
-          el.historyList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">Puthiya signal generate seithal ingu patthivagum.</div>';
+          el.historyList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">Generated signals will appear here.</div>';
           return;
         }
         el.historyList.innerHTML = state.history.slice(0, 8).map(function (item) {
@@ -583,7 +609,7 @@
               '</div>' +
               '<div class="flex items-center gap-2.5">' +
                 '<span class="font-bold ' + dirClass + '">' + item.dir + '</span>' +
-                '<span class="text-slate-300 font-mono">' + item.acc + '%</span>' +
+                '<span class="text-emerald-300 font-mono font-semibold">' + item.acc + '%</span>' +
               '</div>' +
             '</div>'
           );
@@ -593,11 +619,14 @@
       function handleGenerateSignal() {
         var closes = state.candles.map(function (c) { return c.close; });
         var diff = closes.length > 5 ? closes[closes.length - 1] - closes[closes.length - 5] : 0;
+        var aligned = diff !== 0;
         var prob = diff > 0 ? 0.58 : diff < 0 ? 0.42 : 0.5;
         state.direction = Math.random() < prob ? 'CALL' : 'PUT';
-        state.accuracy = state.timeframe === '5m'
-          ? Math.floor(84 + Math.random() * 9)
-          : Math.floor(78 + Math.random() * 11);
+
+        var baseAcc = state.timeframe === '5m' ? 85 : 80;
+        var bonus = aligned ? 5 : 0;
+        var jitter = Math.floor(Math.random() * 8);
+        state.accuracy = Math.min(95, Math.max(75, baseAcc + bonus + jitter));
         state.countdownSec = getDurationForTimeframe(state.timeframe);
         state.signalActive = true;
         state.justExpired = false;
@@ -660,7 +689,7 @@
         }
 
         if (!matches.length) {
-          el.pairListContainer.innerHTML = '<div class="text-slate-400 text-xs py-4 text-center">Pair kidaikkavillai. Vera pair search pannungal.</div>';
+          el.pairListContainer.innerHTML = '<div class="text-slate-400 text-xs py-4 text-center">No matching pairs found.</div>';
           return;
         }
 
