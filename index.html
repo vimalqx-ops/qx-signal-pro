@@ -21,7 +21,7 @@
 <body class="min-h-screen bg-[#070b14] text-slate-100 pb-10">
   <div class="max-w-3xl mx-auto px-4 pt-5 space-y-4">
 
-    <!-- Header & Clocks -->
+    <!-- Header & IST Clock -->
     <header class="glass-card rounded-2xl p-4 space-y-4 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -39,16 +39,9 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs">
-          <div>
-            <div class="text-[10px] uppercase tracking-wider text-slate-400">IST (INDIA)</div>
-            <div id="liveIstClock" class="font-mono font-bold text-emerald-300 text-sm">00:00:00</div>
-          </div>
-          <div class="h-7 w-px bg-slate-700"></div>
-          <div>
-            <div class="text-[10px] uppercase tracking-wider text-slate-400">UTC</div>
-            <div id="liveUtcClock" class="font-mono font-bold text-sky-300 text-sm">00:00:00</div>
-          </div>
+        <div class="bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2 text-right">
+          <div class="text-[10px] uppercase tracking-wider text-slate-400">IST (INDIA)</div>
+          <div id="liveIstClock" class="font-mono font-bold text-emerald-300 text-base">00:00:00</div>
         </div>
       </div>
 
@@ -91,7 +84,7 @@
 
         <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
           <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
-          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">00:30</div>
+          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">01:00</div>
           <div class="text-[11px] text-emerald-400 mt-0.5">
             AI Accuracy: <span id="signalAccuracyText">88%</span>
           </div>
@@ -193,19 +186,23 @@
         { symbol: 'EUR/GBP (OTC)', basePrice: 0.85520, decimals: 5, volatility: 0.00038 }
       ];
 
+      function getDurationForTimeframe(tf) {
+        return tf === '5m' ? 300 : 60;
+      }
+
       const state = {
         selectedPair: PAIRS[0],
         timeframe: '1m',
         direction: 'PUT',
         accuracy: 88,
-        countdownSec: 30,
+        countdownSec: 60,
+        lastTickSec: null,
         candles: [],
         history: []
       };
 
       const el = {
         istClock: document.getElementById('liveIstClock'),
-        utcClock: document.getElementById('liveUtcClock'),
         openPairModalBtn: document.getElementById('openPairModalBtn'),
         closePairModalBtn: document.getElementById('closePairModalBtn'),
         pairModal: document.getElementById('pairModal'),
@@ -243,17 +240,21 @@
         return pad2(Math.floor(s / 60)) + ':' + pad2(s % 60);
       }
 
-      function updateClocks() {
-        const now = new Date();
-        const ist = new Date(now.getTime() + 5.5 * 3600 * 1000);
+      function getIstParts(nowMs) {
+        const ist = new Date(nowMs + 5.5 * 3600 * 1000);
+        return {
+          hh: pad2(ist.getUTCHours()),
+          mm: pad2(ist.getUTCMinutes()),
+          ss: pad2(ist.getUTCSeconds())
+        };
+      }
+
+      function updateIstClock(nowMs) {
+        const parts = getIstParts(nowMs);
         if (el.istClock) {
-          el.istClock.textContent =
-            pad2(ist.getUTCHours()) + ':' + pad2(ist.getUTCMinutes()) + ':' + pad2(ist.getUTCSeconds());
+          el.istClock.textContent = parts.hh + ':' + parts.mm + ':' + parts.ss;
         }
-        if (el.utcClock) {
-          el.utcClock.textContent =
-            pad2(now.getUTCHours()) + ':' + pad2(now.getUTCMinutes()) + ':' + pad2(now.getUTCSeconds());
-        }
+        return parts.hh + ':' + parts.mm + ':' + parts.ss;
       }
 
       function seedCandles(pair) {
@@ -476,12 +477,9 @@
         state.accuracy = state.timeframe === '5m'
           ? Math.floor(84 + Math.random() * 9)
           : Math.floor(78 + Math.random() * 11);
-        state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+        state.countdownSec = getDurationForTimeframe(state.timeframe);
 
-        const now = new Date();
-        const ist = new Date(now.getTime() + 5.5 * 3600 * 1000);
-        const timeStr = pad2(ist.getUTCHours()) + ':' + pad2(ist.getUTCMinutes()) + ':' + pad2(ist.getUTCSeconds());
-
+        const timeStr = updateIstClock(Date.now());
         state.history.unshift({
           pair: state.selectedPair.symbol,
           tf: state.timeframe,
@@ -496,6 +494,7 @@
 
       function handleSetTimeframe(tf) {
         state.timeframe = tf;
+        state.countdownSec = getDurationForTimeframe(tf);
         if (el.tf1mBtn && el.tf5mBtn) {
           if (tf === '1m') {
             el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
@@ -575,24 +574,41 @@
       if (el.tf5mBtn) el.tf5mBtn.addEventListener('click', function () { handleSetTimeframe('5m'); });
       if (el.generateSignalBtn) el.generateSignalBtn.addEventListener('click', handleGenerateSignal);
 
-      // Start immediately
-      seedCandles(state.selectedPair);
-      updateClocks();
-      renderChartAndIndicators();
-      renderSignalCard();
-      renderHistory();
+      function syncLoop() {
+        const nowMs = Date.now();
+        const wholeSec = Math.floor(nowMs / 1000);
+        updateIstClock(nowMs);
 
-      setInterval(function () {
-        updateClocks();
-        if (state.countdownSec > 0) {
-          state.countdownSec -= 1;
-        } else {
-          state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+        if (state.lastTickSec === null) {
+          state.lastTickSec = wholeSec;
+          renderChartAndIndicators();
+          renderSignalCard();
+          return;
         }
-        stepCandle();
-        renderChartAndIndicators();
-        renderSignalCard();
-      }, 1000);
+
+        if (wholeSec > state.lastTickSec) {
+          const elapsed = wholeSec - state.lastTickSec;
+          state.lastTickSec = wholeSec;
+
+          for (let step = 0; step < elapsed; step++) {
+            if (state.countdownSec > 1) {
+              state.countdownSec -= 1;
+            } else {
+              state.countdownSec = getDurationForTimeframe(state.timeframe);
+            }
+            stepCandle();
+          }
+
+          renderChartAndIndicators();
+          renderSignalCard();
+        }
+      }
+
+      // Initialize immediately
+      seedCandles(state.selectedPair);
+      renderHistory();
+      syncLoop();
+      setInterval(syncLoop, 200);
     })();
   </script>
 </body>
