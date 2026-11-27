@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ta" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QX Signal Pro - Quotex Trading Signal Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans Tamil -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tone.js for subtle notification chimes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Tamil', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+                    },
+                    colors: {
+                        darkBg: '#090d16',
+                        cardBg: '#111827',
+                        borderCol: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070b14;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-header {
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Radar / Scanning Animation */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(300%); }
+        }
+        .scanner-bar {
+            animation: scanline 1.5s linear infinite;
+        }
+
+        /* Pulse Glow */
+        @keyframes emeraldGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.25); }
+            50% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.55); }
+        }
+        @keyframes crimsonGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.25); }
+            50% { box-shadow: 0 0 28px rgba(239, 68, 68, 0.55); }
+        }
+        .glow-call { animation: emeraldGlow 2s infinite; }
+        .glow-put { animation: crimsonGlow 2s infinite; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+        /* Optgroup Styling */
+        select optgroup {
+            background-color: #0f172a;
+            color: #10b981;
+            font-weight: 700;
+            font-style: normal;
+        }
+        select option {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Risk Disclaimer Banner -->
+    <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs sm:text-sm text-amber-300">
+        <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-400"></i>
+        <span class="font-semibold">எச்சரிக்கை (Disclaimer):</span> இது கல்வி மற்றும் பயிற்சி நோக்கத்திற்கான (Simulated Technical Analysis) தளம் மட்டுமே. வர்த்தகத்தில் (Trading) ரிஸ்க் உள்ளது; சொந்த முடிவில் வர்த்தகம் செய்யவும்.
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="glass-header sticky top-0 z-40 px-4 sm:px-6 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-chart-line text-white text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            QX Signal Pro
+                        </h1>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            AI v4.2
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-gray-400">Quotex Live & OTC Technical Signal Engine</p>
+                </div>
+            </div>
+
+            <!-- Live Clocks & Market Status -->
+            <div class="flex items-center gap-2 sm:gap-4 ml-auto sm:ml-0">
+                <!-- Market Badge -->
+                <div id="marketStatusBadge" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-800/80 border border-gray-700 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span id="marketStatusText" class="text-emerald-400 font-semibold">OTC 24/7 Active</span>
+                </div>
+
+                <!-- IST & UTC Digital Clock -->
+                <div class="flex items-center gap-3 bg-gray-900/90 border border-gray-800 px-3 py-1.5 rounded-xl">
+                    <div class="text-right">
+                        <div class="text-[10px] text-gray-400 uppercase font-semibold">IST (India)</div>
+                        <div id="istClock" class="font-mono text-xs sm:text-sm font-bold text-white">--:--:--</div>
+                    </div>
+                    <div class="h-6 w-[1px] bg-gray-800"></div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-gray-400 uppercase font-semibold">UTC</div>
+                        <div id="utcClock" class="font-mono text-xs sm:text-sm font-bold text-sky-400">--:--:--</div>
+                    </div>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="soundToggleBtn" title="Toggle Signal Sound" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-gray-300 transition">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-sm text-emerald-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+        <!-- Top Grid: Control Panel (Left) + Active Signal Card (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 1. Signal Control Panel (5 Cols on LG) -->
+            <section class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-emerald-400"></i>
+                                <span>Signal Settings / அமைப்புகள்</span>
+                            </h2>
+                            <p class="text-xs text-gray-400 mt-0.5">சந்தை மற்றும் நேரத்தைத் தேர்ந்தெடுக்கவும்</p>
+                        </div>
+                        <span id="payoutBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                            Payout: 91%
+                        </span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Asset Pair Selector Trigger & Searchable Modal -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">
+                                Asset Pair / நாணய இணை (All Quotex Pairs)
+                            </label>
+                            <div class="relative">
+                                <button type="button" id="assetPickerTrigger" aria-haspopup="dialog" aria-expanded="false" aria-controls="assetPickerModal" class="w-full bg-gray-900/90 border border-gray-700 hover:border-emerald-500/50 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm font-semibold text-white focus:outline-none transition cursor-pointer flex items-center justify-between gap-2 text-left">
+                                    <span id="selectedAssetLabel" class="truncate">🇪🇺🇺🇸 EUR/USD (OTC) - 91%</span>
+                                    <i class="fa-solid fa-magnifying-glass text-emerald-400/80 text-xs shrink-0"></i>
+                                </button>
+                                <!-- Hidden native select kept synchronized for asset metadata lookup -->
+                                <select id="assetSelect" class="sr-only" tabindex="-1" aria-hidden="true">
+                                    
+                                    <!-- FOREX (OTC) -->
+                                    <optgroup label="── FOREX (OTC 24/7) ──">
+                                        <option value="EUR/USD (OTC)" data-payout="91%" data-base="1.08450" data-type="OTC">🇪🇺🇺🇸 EUR/USD (OTC) - 91%</option>
+                                        <option value="GBP/USD (OTC)" data-payout="89%" data-base="1.26720" data-type="OTC">🇬🇧🇺🇸 GBP/USD (OTC) - 89%</option>
+                                        <option value="USD/JPY (OTC)" data-payout="88%" data-base="153.420" data-type="OTC">🇺🇸🇯🇵 USD/JPY (OTC) - 88%</option>
+                                        <option value="USD/INR (OTC)" data-payout="92%" data-base="84.380" data-type="OTC">🇺🇸🇮🇳 USD/INR (OTC) - 92%</option>
+                                        <option value="USD/BRL (OTC)" data-payout="90%" data-base="5.7840" data-type="OTC">🇺🇸🇧🇷 USD/BRL (OTC) - 90%</option>
+                                        <option value="USD/PKR (OTC)" data-payout="89%" data-base="277.85" data-type="OTC">🇺🇸🇵🇰 USD/PKR (OTC) - 89%</option>
+                                        <option value="USD/BDT (OTC)" data-payout="90%" data-base="119.50" data-type="OTC">🇺🇸🇧🇩 USD/BDT (OTC) - 90%</option>
+                                        <option value="USD/NGN (OTC)" data-payout="88%" data-base="1655.00" data-type="OTC">🇺🇸🇳🇬 USD/NGN (OTC) - 88%</option>
+                                        <option value="USD/ARS (OTC)" data-payout="87%" data-base="998.50" data-type="OTC">🇺🇸🇦🇷 USD/ARS (OTC) - 87%</option>
+                                        <option value="USD/COP (OTC)" data-payout="86%" data-base="4410.00" data-type="OTC">🇺🇸🇨🇴 USD/COP (OTC) - 86%</option>
+                                        <option value="USD/DZD (OTC)" data-payout="85%" data-base="133.40" data-type="OTC">🇺🇸🇩🇿 USD/DZD (OTC) - 85%</option>
+                                        <option value="USD/EGP (OTC)" data-payout="87%" data-base="49.25" data-type="OTC">🇺🇸🇪🇬 USD/EGP (OTC) - 87%</option>
+                                        <option value="USD/IDR (OTC)" data-payout="88%" data-base="15860.0" data-type="OTC">🇺🇸🇮🇩 USD/IDR (OTC) - 88%</option>
+                                        <option value="USD/MXN (OTC)" data-payout="89%" data-base="20.145" data-type="OTC">🇺🇸🇲🇽 USD/MXN (OTC) - 89%</option>
+                                        <option value="USD/PHP (OTC)" data-payout="87%" data-base="58.72" data-type="OTC">🇺🇸🇵🇭 USD/PHP (OTC) - 87%</option>
+                                        <option value="USD/TRY (OTC)" data-payout="86%" data-base="34.35" data-type="OTC">🇺🇸🇹🇷 USD/TRY (OTC) - 86%</option>
+                                        <option value="USD/ZAR (OTC)" data-payout="88%" data-base="18.085" data-type="OTC">🇺🇸🇿🇦 USD/ZAR (OTC) - 88%</option>
+                                        <option value="AUD/CAD (OTC)" data-payout="87%" data-base="0.90140" data-type="OTC">🇦🇺🇨🇦 AUD/CAD (OTC) - 87%</option>
+                                        <option value="AUD/CHF (OTC)" data-payout="86%" data-base="0.57320" data-type="OTC">🇦🇺🇨🇭 AUD/CHF (OTC) - 86%</option>
+                                        <option value="AUD/JPY (OTC)" data-payout="88%" data-base="99.640" data-type="OTC">🇦🇺🇯🇵 AUD/JPY (OTC) - 88%</option>
+                                        <option value="AUD/NZD (OTC)" data-payout="85%" data-base="1.10450" data-type="OTC">🇦🇺🇳🇿 AUD/NZD (OTC) - 85%</option>
+                                        <option value="AUD/USD (OTC)" data-payout="89%" data-base="0.64920" data-type="OTC">🇦🇺🇺🇸 AUD/USD (OTC) - 89%</option>
+                                        <option value="CAD/CHF (OTC)" data-payout="86%" data-base="0.63580" data-type="OTC">🇨🇦🇨🇭 CAD/CHF (OTC) - 86%</option>
+                                        <option value="CAD/JPY (OTC)" data-payout="87%" data-base="110.520" data-type="OTC">🇨🇦🇯🇵 CAD/JPY (OTC) - 87%</option>
+                                        <option value="CHF/JPY (OTC)" data-payout="88%" data-base="173.800" data-type="OTC">🇨🇭🇯🇵 CHF/JPY (OTC) - 88%</option>
+                                        <option value="EUR/AUD (OTC)" data-payout="87%" data-base="1.67050" data-type="OTC">🇪🇺🇦🇺 EUR/AUD (OTC) - 87%</option>
+                                        <option value="EUR/CAD (OTC)" data-payout="88%" data-base="1.50620" data-type="OTC">🇪🇺🇨🇦 EUR/CAD (OTC) - 88%</option>
+                                        <option value="EUR/CHF (OTC)" data-payout="86%" data-base="0.95740" data-type="OTC">🇪🇺🇨🇭 EUR/CHF (OTC) - 86%</option>
+                                        <option value="EUR/GBP (OTC)" data-payout="89%" data-base="0.85580" data-type="OTC">🇪🇺🇬🇧 EUR/GBP (OTC) - 89%</option>
+                                        <option value="EUR/JPY (OTC)" data-payout="90%" data-base="166.410" data-type="OTC">🇪🇺🇯🇵 EUR/JPY (OTC) - 90%</option>
+                                        <option value="EUR/NZD (OTC)" data-payout="86%" data-base="1.84520" data-type="OTC">🇪🇺🇳🇿 EUR/NZD (OTC) - 86%</option>
+                                        <option value="GBP/AUD (OTC)" data-payout="87%" data-base="1.95180" data-type="OTC">🇬🇧🇦🇺 GBP/AUD (OTC) - 87%</option>
+                                        <option value="GBP/CAD (OTC)" data-payout="88%" data-base="1.75980" data-type="OTC">🇬🇧🇨🇦 GBP/CAD (OTC) - 88%</option>
+                                        <option value="GBP/CHF (OTC)" data-payout="86%" data-base="1.11850" data-type="OTC">🇬🇧🇨🇭 GBP/CHF (OTC) - 86%</option>
+                                        <option value="GBP/JPY (OTC)" data-payout="89%" data-base="194.450" data-type="OTC">🇬🇧🇯🇵 GBP/JPY (OTC) - 89%</option>
+                                        <option value="GBP/NZD (OTC)" data-payout="85%" data-base="2.15600" data-type="OTC">🇬🇧🇳🇿 GBP/NZD (OTC) - 85%</option>
+                                        <option value="NZD/CAD (OTC)" data-payout="86%" data-base="0.81620" data-type="OTC">🇳🇿🇨🇦 NZD/CAD (OTC) - 86%</option>
+                                        <option value="NZD/CHF (OTC)" data-payout="85%" data-base="0.51890" data-type="OTC">🇳🇿🇨🇭 NZD/CHF (OTC) - 85%</option>
+                                        <option value="NZD/JPY (OTC)" data-payout="87%" data-base="90.190" data-type="OTC">🇳🇿🇯🇵 NZD/JPY (OTC) - 87%</option>
+                                        <option value="NZD/USD (OTC)" data-payout="88%" data-base="0.58780" data-type="OTC">🇳🇿🇺🇸 NZD/USD (OTC) - 88%</option>
+                                        <option value="USD/CAD (OTC)" data-payout="89%" data-base="1.38850" data-type="OTC">🇺🇸🇨🇦 USD/CAD (OTC) - 89%</option>
+                                        <option value="USD/CHF (OTC)" data-payout="88%" data-base="0.88260" data-type="OTC">🇺🇸🇨🇭 USD/CHF (OTC) - 88%</option>
+                                    </optgroup>
+
+                                    <!-- FOREX (LIVE) -->
+                                    <optgroup label="── FOREX (LIVE MARKET) ──">
+                                        <option value="EUR/USD" data-payout="84%" data-base="1.08510" data-type="LIVE">🇪🇺🇺🇸 EUR/USD - 84%</option>
+                                        <option value="GBP/USD" data-payout="83%" data-base="1.26780" data-type="LIVE">🇬🇧🇺🇸 GBP/USD - 83%</option>
+                                        <option value="USD/JPY" data-payout="82%" data-base="153.480" data-type="LIVE">🇺🇸🇯🇵 USD/JPY - 82%</option>
+                                        <option value="AUD/USD" data-payout="81%" data-base="0.64950" data-type="LIVE">🇦🇺🇺🇸 AUD/USD - 81%</option>
+                                        <option value="USD/CAD" data-payout="82%" data-base="1.38890" data-type="LIVE">🇺🇸🇨🇦 USD/CAD - 82%</option>
+                                        <option value="USD/CHF" data-payout="80%" data-base="0.88290" data-type="LIVE">🇺🇸🇨🇭 USD/CHF - 80%</option>
+                                        <option value="NZD/USD" data-payout="80%" data-base="0.58810" data-type="LIVE">🇳🇿🇺🇸 NZD/USD - 80%</option>
+                                        <option value="EUR/GBP" data-payout="83%" data-base="0.85610" data-type="LIVE">🇪🇺🇬🇧 EUR/GBP - 83%</option>
+                                        <option value="EUR/JPY" data-payout="84%" data-base="166.480" data-type="LIVE">🇪🇺🇯🇵 EUR/JPY - 84%</option>
+                                        <option value="GBP/JPY" data-payout="83%" data-base="194.520" data-type="LIVE">🇬🇧🇯🇵 GBP/JPY - 83%</option>
+                                        <option value="AUD/CAD" data-payout="80%" data-base="0.90190" data-type="LIVE">🇦🇺🇨🇦 AUD/CAD - 80%</option>
+                                        <option value="AUD/CHF" data-payout="79%" data-base="0.57350" data-type="LIVE">🇦🇺🇨🇭 AUD/CHF - 79%</option>
+                                        <option value="AUD/JPY" data-payout="81%" data-base="99.690" data-type="LIVE">🇦🇺🇯🇵 AUD/JPY - 81%</option>
+                                        <option value="CAD/JPY" data-payout="80%" data-base="110.580" data-type="LIVE">🇨🇦🇯🇵 CAD/JPY - 80%</option>
+                                        <option value="CHF/JPY" data-payout="81%" data-base="173.860" data-type="LIVE">🇨🇭🇯🇵 CHF/JPY - 81%</option>
+                                        <option value="EUR/AUD" data-payout="82%" data-base="1.67120" data-type="LIVE">🇪🇺🇦🇺 EUR/AUD - 82%</option>
+                                        <option value="EUR/CAD" data-payout="81%" data-base="1.50680" data-type="LIVE">🇪🇺🇨🇦 EUR/CAD - 81%</option>
+                                        <option value="GBP/AUD" data-payout="80%" data-base="1.95240" data-type="LIVE">🇬🇧🇦🇺 GBP/AUD - 80%</option>
+                                        <option value="GBP/CAD" data-payout="81%" data-base="1.76040" data-type="LIVE">🇬🇧🇨🇦 GBP/CAD - 81%</option>
+                                    </optgroup>
+
+                                    <!-- CRYPTO -->
+                                    <optgroup label="── CRYPTOCURRENCIES ──">
+                                        <option value="Bitcoin (OTC)" data-payout="88%" data-base="91420.0" data-type="OTC">₿ Bitcoin (OTC) - 88%</option>
+                                        <option value="Bitcoin (BTC)" data-payout="85%" data-base="91450.0" data-type="LIVE">₿ Bitcoin (BTC) - 85%</option>
+                                        <option value="Ethereum (OTC)" data-payout="87%" data-base="3125.40" data-type="OTC">Ξ Ethereum (OTC) - 87%</option>
+                                        <option value="Ethereum (ETH)" data-payout="84%" data-base="3128.00" data-type="LIVE">Ξ Ethereum (ETH) - 84%</option>
+                                        <option value="Solana (OTC)" data-payout="86%" data-base="218.50" data-type="OTC">◎ Solana (OTC) - 86%</option>
+                                        <option value="Ripple (XRP)" data-payout="84%" data-base="1.1240" data-type="LIVE">✕ Ripple (XRP) - 84%</option>
+                                        <option value="Binance Coin (BNB)" data-payout="83%" data-base="624.80" data-type="LIVE">◈ Binance Coin (BNB) - 83%</option>
+                                        <option value="Cardano (ADA)" data-payout="82%" data-base="0.7420" data-type="LIVE">₳ Cardano (ADA) - 82%</option>
+                                        <option value="Dogecoin (DOGE)" data-payout="85%" data-base="0.3845" data-type="LIVE">Ð Dogecoin (DOGE) - 85%</option>
+                                        <option value="Litecoin (LTC)" data-payout="82%" data-base="86.40" data-type="LIVE">Ł Litecoin (LTC) - 82%</option>
+                                        <option value="Avalanche (AVAX)" data-payout="81%" data-base="35.20" data-type="LIVE">🔺 Avalanche (AVAX) - 81%</option>
+                                        <option value="Polkadot (DOT)" data-payout="80%" data-base="5.85" data-type="LIVE">● Polkadot (DOT) - 80%</option>
+                                        <option value="Chainlink (LINK)" data-payout="81%" data-base="14.90" data-type="LIVE">⬡ Chainlink (LINK) - 81%</option>
+                                        <option value="Toncoin (TON)" data-payout="84%" data-base="5.48" data-type="LIVE">💎 Toncoin (TON) - 84%</option>
+                                        <option value="Shiba Inu (SHIB)" data-payout="83%" data-base="0.000025" data-type="LIVE">🐕 Shiba Inu (SHIB) - 83%</option>
+                                        <option value="Tron (TRX)" data-payout="82%" data-base="0.1985" data-type="LIVE">♦ Tron (TRX) - 82%</option>
+                                    </optgroup>
+
+                                    <!-- COMMODITIES -->
+                                    <optgroup label="── COMMODITIES ──">
+                                        <option value="Gold (OTC)" data-payout="90%" data-base="2645.50" data-type="OTC">🪙 XAU/USD Gold (OTC) - 90%</option>
+                                        <option value="Gold (XAU/USD)" data-payout="85%" data-base="2647.20" data-type="LIVE">🪙 Gold (XAU/USD) - 85%</option>
+                                        <option value="Silver (OTC)" data-payout="88%" data-base="31.240" data-type="OTC">🥈 XAG/USD Silver (OTC) - 88%</option>
+                                        <option value="Silver (XAG/USD)" data-payout="83%" data-base="31.280" data-type="LIVE">🥈 Silver (XAG/USD) - 83%</option>
+                                        <option value="UKBrent (OTC)" data-payout="87%" data-base="72.65" data-type="OTC">🛢️ UKBrent Oil (OTC) - 87%</option>
+                                        <option value="USCrude (OTC)" data-payout="87%" data-base="68.90" data-type="OTC">🛢️ USCrude Oil (OTC) - 87%</option>
+                                        <option value="Natural Gas (OTC)" data-payout="84%" data-base="2.945" data-type="OTC">🔥 Natural Gas (OTC) - 84%</option>
+                                        <option value="Platinum (OTC)" data-payout="83%" data-base="968.40" data-type="OTC">⬜ Platinum (OTC) - 83%</option>
+                                        <option value="Copper (OTC)" data-payout="82%" data-base="4.125" data-type="OTC">🟧 Copper (OTC) - 82%</option>
+                                    </optgroup>
+
+                                    <!-- STOCKS (OTC) -->
+                                    <optgroup label="── STOCKS (OTC) ──">
+                                        <option value="Microsoft (OTC)" data-payout="88%" data-base="418.50" data-type="OTC">🪟 Microsoft Corp (OTC) - 88%</option>
+                                        <option value="Apple (OTC)" data-payout="89%" data-base="228.40" data-type="OTC">🍎 Apple Inc (OTC) - 89%</option>
+                                        <option value="Google (OTC)" data-payout="87%" data-base="176.80" data-type="OTC">🔍 Alphabet/Google (OTC) - 87%</option>
+                                        <option value="Amazon (OTC)" data-payout="88%" data-base="202.15" data-type="OTC">📦 Amazon.com (OTC) - 88%</option>
+                                        <option value="Meta/Facebook (OTC)" data-payout="87%" data-base="564.20" data-type="OTC">♾️ Meta Platforms (OTC) - 87%</option>
+                                        <option value="Tesla (OTC)" data-payout="89%" data-base="338.90" data-type="OTC">⚡ Tesla Inc (OTC) - 89%</option>
+                                        <option value="Intel (OTC)" data-payout="86%" data-base="24.85" data-type="OTC">💻 Intel Corp (OTC) - 86%</option>
+                                        <option value="McDonald's (OTC)" data-payout="85%" data-base="292.30" data-type="OTC">🍔 McDonald's Corp (OTC) - 85%</option>
+                                        <option value="Boeing (OTC)" data-payout="86%" data-base="148.60" data-type="OTC">✈️ Boeing Co (OTC) - 86%</option>
+                                        <option value="Pfizer (OTC)" data-payout="85%" data-base="25.90" data-type="OTC">💊 Pfizer Inc (OTC) - 85%</option>
+                                        <option value="Johnson & Johnson (OTC)" data-payout="84%" data-base="154.70" data-type="OTC">🏥 Johnson & Johnson (OTC) - 84%</option>
+                                        <option value="American Express (OTC)" data-payout="86%" data-base="286.40" data-type="OTC">💳 American Express (OTC) - 86%</option>
+                                        <option value="Visa (OTC)" data-payout="85%" data-base="308.10" data-type="OTC">💳 Visa Inc (OTC) - 85%</option>
+                                        <option value="Coca-Cola (OTC)" data-payout="84%" data-base="62.45" data-type="OTC">🥤 Coca-Cola Co (OTC) - 84%</option>
+                                    </optgroup>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Expiry Timeframe Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">
+                                Expiry Timeframe / கால அளவு
+                            </label>
+                            <div class="grid grid-cols-3 gap-2.5" id="timeframeGroup">
+                                <button type="button" data-tf="1" class="tf-btn active py-2.5 px-3 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold text-xs sm:text-sm transition">
+                                    1 Min (1M)
+                                </button>
+                                <button type="button" data-tf="2" class="tf-btn py-2.5 px-3 rounded-xl border border-gray-700 bg-gray-900/80 text-gray-400 hover:text-white font-bold text-xs sm:text-sm transition">
+                                    2 Min (2M)
+                                </button>
+                                <button type="button" data-tf="5" class="tf-btn py-2.5 px-3 rounded-xl border border-gray-700 bg-gray-900/80 text-gray-400 hover:text-white font-bold text-xs sm:text-sm transition">
+                                    5 Min (5M)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Signal Action Button -->
+                <div class="mt-6 pt-4 border-t border-gray-800">
+                    <button id="generateBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.99] text-gray-950 font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>GENERATE SIGNAL / சிக்னல் பெறுக</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. Active Signal Display Card (7 Cols on LG) -->
+            <section id="signalCard" class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
+                
+                <!-- Scanning Overlay (Hidden by default, shown during scan) -->
+                <div id="scanningOverlay" class="hidden absolute inset-0 z-20 bg-gray-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 relative overflow-hidden">
+                        <i class="fa-solid fa-microchip text-2xl text-emerald-400 animate-pulse"></i>
+                        <div class="scanner-bar absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_10px_#10b981]"></div>
+                    </div>
+                    <h3 id="scanStepTitle" class="text-base sm:text-lg font-bold text-white">சந்தை தரவுகள் ஆய்வு செய்யப்படுகின்றன...</h3>
+                    <p id="scanStepSub" class="text-xs text-emerald-400 font-mono mt-1">Scanning Candlestick Patterns & RSI Divergence...</p>
+                    <div class="w-56 h-1.5 bg-gray-800 rounded-full overflow-hidden mt-4">
+                        <div id="scanProgressBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 15%"></div>
+                    </div>
+                </div>
+
+                <!-- Header of Active Signal Card -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-gray-800">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+                        <h2 class="text-base sm:text-lg font-bold text-white">Active Signal / தற்போதைய சிக்னல்</h2>
+                    </div>
+                    <div id="signalStatusPill" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700">
+                        Waiting for Scan / தயார் நிலையில் உள்ளது
+                    </div>
+                </div>
+
+                <!-- Empty State (Shown before first signal) -->
+                <div id="emptySignalState" class="my-auto py-8 text-center space-y-3">
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-gray-800/80 border border-gray-700 flex items-center justify-center text-gray-400">
+                        <i class="fa-solid fa-satellite-dish text-2xl text-emerald-400/80"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-gray-200">சிக்னல் உருவாக்கத் தயாராக உள்ளது</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
+                        இடதுபுறம் உள்ள பட்டியலில் Asset Pair மற்றும் Timeframe-ஐத் தேர்ந்தெடுத்து <span class="text-emerald-400 font-semibold">"Generate Signal"</span> பொத்தானை அழுத்தவும்.
+                    </p>
+                </div>
+
+                <!-- Generated Signal Content (Hidden initially) -->
+                <div id="activeSignalContent" class="hidden space-y-5 my-auto pt-3">
+                    <!-- Main Direction Banner -->
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                        <!-- Asset & Entry Info -->
+                        <div class="sm:col-span-6 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span id="sigAsset" class="text-xl sm:text-2xl font-extrabold text-white">EUR/USD (OTC)</span>
+                                <span id="sigTimeframeBadge" class="px-2 py-0.5 rounded-md bg-gray-800 border border-gray-700 text-xs font-bold text-sky-400">1M</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-2.5">
+                                    <div class="text-[10px] text-gray-400 uppercase">Entry Time (IST)</div>
+                                    <div id="sigEntryTime" class="font-mono text-sm sm:text-base font-bold text-white mt-0.5">--:--:00</div>
+                                </div>
+                                <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-2.5">
+                                    <div class="text-[10px] text-gray-400 uppercase">Expiry Time</div>
+                                    <div id="sigExpiryTime" class="font-mono text-sm sm:text-base font-bold text-amber-400 mt-0.5">--:--:00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CALL / PUT Big Badge -->
+                        <div class="sm:col-span-6">
+                            <div id="directionBox" class="rounded-2xl p-4 border flex items-center justify-between bg-emerald-500/15 border-emerald-500/40 glow-call">
+                                <div>
+                                    <div class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Direction / திசை</div>
+                                    <div id="sigDirectionText" class="text-2xl sm:text-3xl font-black tracking-tight text-emerald-400 mt-0.5">
+                                        CALL (UP)
+                                    </div>
+                                    <div id="sigTamilAction" class="text-xs font-semibold text-emerald-300 mt-0.5">
+                                        மேலே செல்லும் (Buy / Higher)
+                                    </div>
+                                </div>
+                                <div id="sigDirectionIcon" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500 text-gray-950 flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Countdown & Confidence Meter -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-900/70 border border-gray-800 rounded-xl p-3.5">
+                        <div class="flex items-center justify-between sm:justify-start gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                                <i class="fa-regular fa-hourglass-half"></i>
+                            </div>
+                            <div>
+                                <div id="countdownLabel" class="text-[11px] text-gray-400">Entry Starts In / நுழைவு நேரம்</div>
+                                <div id="countdownTimer" class="font-mono text-lg font-extrabold text-sky-400">00:34</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col justify-center">
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-gray-400">AI Accuracy / துல்லியம்</span>
+                                <span id="sigConfidence" class="text-emerald-400 font-bold">89%</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div id="confidenceBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style="width: 89%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Indicators Breakdown -->
+                    <div class="grid grid-cols-3 gap-2.5 text-center">
+                        <div class="bg-gray-900/60 border border-gray-800/90 rounded-xl p-2.5">
+                            <div class="text-[10px] text-gray-400 font-semibold">RSI (14)</div>
+                            <div id="indRsi" class="text-xs sm:text-sm font-bold text-white mt-0.5">28.4 (Oversold)</div>
+                        </div>
+                        <div class="bg-gray-900/60 border border-gray-800/90 rounded-xl p-2.5">
+                            <div class="text-[10px] text-gray-400 font-semibold">EMA (9/21)</div>
+                            <div id="indEma" class="text-xs sm:text-sm font-bold text-emerald-400 mt-0.5">Bullish Cross</div>
+                        </div>
+                        <div class="bg-gray-900/60 border border-gray-800/90 rounded-xl p-2.5">
+                            <div class="text-[10px] text-gray-400 font-semibold">MACD</div>
+                            <div id="indMacd" class="text-xs sm:text-sm font-bold text-sky-400 mt-0.5">+0.00042</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 3. Live Simulated Candlestick & Price Action Chart -->
+        <section class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-candlestick text-sky-400"></i>
+                        <span id="chartTitle">EUR/USD (OTC) - Live Price Action</span>
+                    </h2>
+                    <p class="text-xs text-gray-400">நிகழ்நேர மெழுகுவர்த்தி வரைபடம் (Simulated Candlestick + EMA 9 Indicator)</p>
+                </div>
+
+                <!-- Live Price Ticker & Legend -->
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex items-center gap-3 text-xs">
+                        <span class="flex items-center gap-1.5 text-gray-300"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Bullish</span>
+                        <span class="flex items-center gap-1.5 text-gray-300"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Bearish</span>
+                        <span class="flex items-center gap-1.5 text-gray-300"><span class="w-3 h-0.5 bg-amber-400"></span> EMA 9</span>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                        <span class="text-[10px] text-gray-400 uppercase">Price:</span>
+                        <span id="livePriceDisplay" class="font-mono text-sm font-bold text-emerald-400">1.08450</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Responsive Canvas Wrapper -->
+            <div class="w-full h-64 sm:h-80 bg-gray-950/90 rounded-xl border border-gray-800/90 relative overflow-hidden">
+                <canvas id="priceChartCanvas" class="w-full h-full block"></canvas>
+            </div>
+        </section>
+
+        <!-- 4. Signal History & Win-Rate Analytics Table -->
+        <section class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
+                        <span>Signal History & Win Rate / சிக்னல் வரலாறு</span>
+                    </h2>
+                    <p class="text-xs text-gray-400">உருவாக்கப்பட்ட சிக்னல்கள் மற்றும் வெற்றி விகிதம் (Win/Loss கண்காணிப்பு)</p>
+                </div>
+
+                <!-- Win Rate Analytics Pills -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="px-3 py-1.5 rounded-xl bg-gray-900 border border-gray-800 text-xs">
+                        <span class="text-gray-400">Total:</span>
+                        <span id="statTotal" class="font-bold text-white ml-1">3</span>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                        <span class="text-emerald-300">Wins:</span>
+                        <span id="statWins" class="font-bold text-emerald-400 ml-1">3</span>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs">
+                        <span class="text-rose-300">Losses:</span>
+                        <span id="statLosses" class="font-bold text-rose-400 ml-1">0</span>
+                    </div>
+                    <div class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 text-xs">
+                        <span class="text-gray-200 font-medium">Win Rate:</span>
+                        <span id="statWinRate" class="font-extrabold text-emerald-400 ml-1">100%</span>
+                    </div>
+                    <button id="clearHistoryBtn" class="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition" title="Clear History">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Responsive Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-[11px] uppercase tracking-wider text-gray-400">
+                            <th class="py-3 px-4">Asset Pair</th>
+                            <th class="py-3 px-4">Entry Time</th>
+                            <th class="py-3 px-4">Expiry</th>
+                            <th class="py-3 px-4">Direction</th>
+                            <th class="py-3 px-4">Engine</th>
+                            <th class="py-3 px-4 text-right">Result / நிலை</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-gray-800/60 text-xs sm:text-sm">
+                        <!-- Rows populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Custom Toast Notification Box (Replaces alert) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Searchable Asset Pair Selector Modal -->
+    <div id="assetPickerModal" role="dialog" aria-modal="true" aria-labelledby="assetModalTitle" class="hidden fixed inset-0 z-50 bg-gray-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+        <div id="assetPickerPanel" class="w-full max-w-lg max-h-[86vh] glass-card rounded-2xl border border-gray-700/90 shadow-2xl flex flex-col overflow-hidden">
+            <!-- Sticky Top Header & Search Input -->
+            <div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-md border-b border-gray-800 p-4 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <h3 id="assetModalTitle" class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                            <span>Select Asset Pair / நாணய இணையைத் தேர்ந்தெடுக்கவும்</span>
+                        </h3>
+                        <p class="text-[11px] text-gray-400">Type 'INR', 'OTC', 'BTC', 'EUR/USD', or 'Gold' to filter</p>
+                    </div>
+                    <button type="button" id="closeAssetModalBtn" aria-label="Close pair selector" class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 text-xs pointer-events-none"></i>
+                    <input type="text" id="assetSearchInput" autocomplete="off" placeholder="Search pair (e.g. INR, OTC, BTC, EUR/USD, Gold)..." class="w-full bg-gray-950/90 border border-gray-700 focus:border-emerald-500 rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none transition">
+                    <button type="button" id="clearAssetSearchBtn" aria-label="Clear search" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 transition cursor-pointer">
+                        <i class="fa-solid fa-circle-xmark text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Categorized Pairs List with Radio Indicators -->
+            <div id="assetPickerList" class="flex-1 overflow-y-auto divide-y divide-gray-800/70 bg-gray-900/60">
+                <!-- Populated dynamically from #assetSelect -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // ==========================================
+        // 1. STATE MANAGEMENT & CONFIGURATION
+        // ==========================================
+        const state = {
+            selectedAsset: 'EUR/USD (OTC)',
+            selectedTimeframe: 1, // in minutes
+            selectedStrategy: 'Multi-Indicator AI (RSI + EMA + MACD + BB)',
+            basePrice: 1.08450,
+            currentPrice: 1.08450,
+            candles: [],
+            entryMarker: null, // { index, price, direction }
+            activeSignal: null,
+            countdownInterval: null,
+            soundEnabled: true,
+            history: [
+                { id: 101, asset: 'EUR/USD (OTC)', entryTime: '09:42:00', expiry: '1 Min', direction: 'CALL', strategy: 'AI Multi-Indicator', status: 'WIN' },
+                { id: 102, asset: 'Gold (OTC)', entryTime: '09:55:00', expiry: '2 Min', direction: 'PUT', strategy: 'AI Multi-Indicator', status: 'WIN' },
+                { id: 103, asset: 'GBP/USD (OTC)', entryTime: '10:12:00', expiry: '1 Min', direction: 'CALL', strategy: 'AI Multi-Indicator', status: 'WIN' }
+            ]
+        };
+
+        // DOM Elements
+        const assetSelect = document.getElementById('assetSelect');
+        const assetPickerTrigger = document.getElementById('assetPickerTrigger');
+        const selectedAssetLabel = document.getElementById('selectedAssetLabel');
+        const assetPickerModal = document.getElementById('assetPickerModal');
+        const assetPickerPanel = document.getElementById('assetPickerPanel');
+        const closeAssetModalBtn = document.getElementById('closeAssetModalBtn');
+        const assetSearchInput = document.getElementById('assetSearchInput');
+        const clearAssetSearchBtn = document.getElementById('clearAssetSearchBtn');
+        const assetPickerList = document.getElementById('assetPickerList');
+        const tfButtons = document.querySelectorAll('.tf-btn');
+        const generateBtn = document.getElementById('generateBtn');
+        const scanningOverlay = document.getElementById('scanningOverlay');
+        const scanProgressBar = document.getElementById('scanProgressBar');
+        const scanStepTitle = document.getElementById('scanStepTitle');
+        const scanStepSub = document.getElementById('scanStepSub');
+        const canvas = document.getElementById('priceChartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // ==========================================
+        // 5. CONTROL PANEL & SEARCHABLE PAIR PICKER
+        // ==========================================
+        function buildAssetCatalog() {
+            const groups = [];
+            assetSelect.querySelectorAll('optgroup').forEach(optgroup => {
+                const cleanGroupLabel = optgroup.label.replace(/^[─\s]+|[─\s]+$/g, '').trim();
+                const items = [];
+                optgroup.querySelectorAll('option').forEach(opt => {
+                    items.push({
+                        value: opt.value,
+                        text: opt.textContent.trim(),
+                        payout: opt.dataset.payout || '',
+                        base: parseFloat(opt.dataset.base),
+                        type: opt.dataset.type || 'OTC',
+                        group: cleanGroupLabel
+                    });
+                });
+                groups.push({ label: cleanGroupLabel, items });
+            });
+            return groups;
+        }
+
+        const assetCatalog = buildAssetCatalog();
+
+        function applyAssetSelection(value) {
+            const matchedOption = Array.from(assetSelect.options).find(opt => opt.value === value);
+            if (!matchedOption) return;
+
+            assetSelect.value = matchedOption.value;
+            selectedAssetLabel.textContent = matchedOption.textContent.trim();
+
+            state.selectedAsset = matchedOption.value;
+            state.basePrice = parseFloat(matchedOption.dataset.base);
+            state.currentPrice = state.basePrice;
+
+            // Update UI badges
+            document.getElementById('payoutBadge').textContent = `Payout: ${matchedOption.dataset.payout}`;
+            document.getElementById('chartTitle').textContent = `${state.selectedAsset} - Live Price Action`;
+
+            const mType = matchedOption.dataset.type;
+            const marketBadgeText = document.getElementById('marketStatusText');
+            marketBadgeText.textContent = mType === 'OTC' ? 'OTC 24/7 Active' : 'Live Market Session';
+
+            // Reset & re-seed candles for new asset
+            state.entryMarker = null;
+            initCandles();
+            drawChart();
+        }
+
+        function renderAssetPickerList(filterQuery = '') {
+            const query = filterQuery.trim().toLowerCase();
+            clearAssetSearchBtn.classList.toggle('hidden', query.length === 0);
+            assetPickerList.innerHTML = '';
+
+            let totalMatches = 0;
+
+            assetCatalog.forEach(group => {
+                const matchingItems = query
+                    ? group.items.filter(item =>
+                        item.text.toLowerCase().includes(query) ||
+                        item.value.toLowerCase().includes(query) ||
+                        item.group.toLowerCase().includes(query) ||
+                        item.payout.toLowerCase().includes(query)
+                    )
+                    : group.items;
+
+                if (matchingItems.length === 0) return;
+                totalMatches += matchingItems.length;
+
+                const section = document.createElement('div');
+
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'px-4 py-2 bg-gray-950/85 text-[11px] font-bold tracking-wider uppercase text-emerald-400 border-b border-gray-800/80 flex items-center justify-between';
+                groupHeader.innerHTML = `<span>── ${group.label} ──</span><span class="text-gray-500 font-mono">${matchingItems.length}</span>`;
+                section.appendChild(groupHeader);
+
+                matchingItems.forEach(item => {
+                    const isSelected = item.value === state.selectedAsset;
+                    const rowBtn = document.createElement('button');
+                    rowBtn.type = 'button';
+                    rowBtn.setAttribute('role', 'radio');
+                    rowBtn.setAttribute('aria-checked', String(isSelected));
+                    rowBtn.className = `w-full px-4 py-3 flex items-center justify-between gap-3 text-left transition cursor-pointer ${
+                        isSelected
+                            ? 'bg-emerald-500/15 text-white'
+                            : 'hover:bg-gray-800/70 text-gray-200'
+                    }`;
+
+                    rowBtn.innerHTML = `
+                        <span class="text-xs sm:text-sm font-semibold leading-snug">${item.text}</span>
+                        <span class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition ${
+                            isSelected
+                                ? 'border-emerald-400 bg-emerald-500/20'
+                                : 'border-gray-600'
+                        }">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 transition-transform ${
+                                isSelected ? 'scale-100' : 'scale-0'
+                            }"></span>
+                        </span>
+                    `;
+
+                    rowBtn.addEventListener('click', () => {
+                        applyAssetSelection(item.value);
+                        closeAssetModal();
+                    });
+
+                    section.appendChild(rowBtn);
+                });
+
+                assetPickerList.appendChild(section);
+            });
+
+            if (totalMatches === 0) {
+                const emptyBox = document.createElement('div');
+                emptyBox.className = 'py-10 px-4 text-center space-y-1.5';
+                emptyBox.innerHTML = `
+                    <p class="text-sm font-semibold text-gray-300">No matching pair found / இணை கிடைக்கவில்லை</p>
+                    <p class="text-xs text-gray-500">Try searching for another currency, OTC, crypto, or stock pair.</p>
+                `;
+                assetPickerList.appendChild(emptyBox);
+            }
+        }
+
+        function openAssetModal() {
+            assetPickerModal.classList.remove('hidden');
+            assetPickerTrigger.setAttribute('aria-expanded', 'true');
+            assetSearchInput.value = '';
+            renderAssetPickerList('');
+            setTimeout(() => assetSearchInput.focus(), 40);
+        }
+
+        function closeAssetModal() {
+            assetPickerModal.classList.add('hidden');
+            assetPickerTrigger.setAttribute('aria-expanded', 'false');
+            assetSearchInput.value = '';
+        }
+
+        assetPickerTrigger.addEventListener('click', openAssetModal);
+        closeAssetModalBtn.addEventListener('click', closeAssetModal);
+
+        assetSearchInput.addEventListener('input', (e) => {
+            renderAssetPickerList(e.target.value);
+        });
+
+        clearAssetSearchBtn.addEventListener('click', () => {
+            assetSearchInput.value = '';
+            renderAssetPickerList('');
+            assetSearchInput.focus();
+        });
+
+        assetPickerModal.addEventListener('click', (e) => {
+            if (!assetPickerPanel.contains(e.target)) {
+                closeAssetModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !assetPickerModal.classList.contains('hidden')) {
+                closeAssetModal();
+            }
+        });
+
+        assetSelect.addEventListener('change', (e) => {
+            applyAssetSelection(e.target.value);
+        });
+
+        tfButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tfButtons.forEach(b => {
+                    b.classList.remove('active', 'border-emerald-500', 'bg-emerald-500/20', 'text-emerald-300');
+                    b.classList.add('border-gray-700', 'bg-gray-900/80', 'text-gray-400');
+                });
+                btn.classList.add('active', 'border-emerald-500', 'bg-emerald-500/20', 'text-emerald-300');
+                btn.classList.remove('border-gray-700', 'bg-gray-900/80', 'text-gray-400');
+                state.selectedTimeframe = parseInt(btn.dataset.tf, 10);
+            });
+        });
+
+        // ==========================================
+        // 6. SIGNAL GENERATION & TECHNICAL SCANNER
+        // ==========================================
+        generateBtn.addEventListener('click', () => {
+            if (generateBtn.disabled) return;
+            startTechnicalScan();
+        });
+
+        function startTechnicalScan() {
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-60', 'cursor-not-allowed');
+            scanningOverlay.classList.remove('hidden');
+            scanProgressBar.style.width = '15%';
+
+            const steps = [
+                { pct: '35%', title: 'மெழுகுவர்த்தி அமைப்பு ஆய்வு...', sub: `Analyzing ${state.selectedAsset} Price Action & Bollinger Bands...` },
+                { pct: '70%', title: 'RSI, EMA & MACD குறியீடுகள் சரிபார்ப்பு...', sub: 'Combining RSI (14), EMA (9/21) & MACD Momentum...' },
+                { pct: '100%', title: 'சிக்னல் உறுதி செய்யப்பட்டது!', sub: 'Syncing Entry Timestamp with Quotex Server...' }
+            ];
+
+            let stepIdx = 0;
+            const stepTimer = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    scanProgressBar.style.width = steps[stepIdx].pct;
+                    scanStepTitle.textContent = steps[stepIdx].title;
+                    scanStepSub.textContent = steps[stepIdx].sub;
+                    stepIdx++;
+                } else {
+                    clearInterval(stepTimer);
+                    setTimeout(() => {
+                        scanningOverlay.classList.add('hidden');
+                        generateBtn.disabled = false;
+                        generateBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                        produceSignal();
+                    }, 300);
+                }
+            }, 500);
+        }
+
+        function produceSignal() {
+            const lastCandle = state.candles[state.candles.length - 1];
+            const prevCandle = state.candles[state.candles.length - 2];
+            const isCall = lastCandle && prevCandle ? (lastCandle.close >= prevCandle.open ? Math.random() > 0.35 : Math.random() > 0.65) : Math.random() > 0.5;
+            const direction = isCall ? 'CALL' : 'PUT';
+
+            // Calculate Entry Time (Next full minute in IST) & Expiry Time
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const istNow = new Date(now.getTime() + istOffset);
+            
+            const entryDate = new Date(istNow);
+            entryDate.setSeconds(0, 0);
+            entryDate.setMinutes(entryDate.getMinutes() + 1);
+
+            const expiryDate = new Date(entryDate.getTime() + state.selectedTimeframe * 60000);
+
+            const formatTime = (d) => d.toISOString().substr(11, 8);
+            const entryTimeStr = formatTime(entryDate);
+            const expiryTimeStr = formatTime(expiryDate);
+
+            // Confidence & Technical Indicators
+            const confidence = Math.floor(Math.random() * (94 - 82 + 1)) + 82;
+            const rsiVal = isCall ? (Math.random() * (34 - 22) + 22).toFixed(1) : (Math.random() * (79 - 67) + 67).toFixed(1);
+            const rsiLabel = isCall ? `${rsiVal} (Oversold)` : `${rsiVal} (Overbought)`;
+            const emaLabel = isCall ? 'Bullish Cross ↑' : 'Bearish Cross ↓';
+            const macdVal = isCall ? `+${(Math.random() * 0.0008 + 0.0001).toFixed(5)}` : `-${(Math.random() * 0.0008 + 0.0001).toFixed(5)}`;
+
+            // Update Active Signal UI
+            document.getElementById('emptySignalState').classList.add('hidden');
+            document.getElementById('activeSignalContent').classList.remove('hidden');
+
+            document.getElementById('sigAsset').textContent = state.selectedAsset;
+            document.getElementById('sigTimeframeBadge').textContent = `${state.selectedTimeframe}M`;
+            document.getElementById('sigEntryTime').textContent = entryTimeStr;
+            document.getElementById('sigExpiryTime').textContent = expiryTimeStr;
+            document.getElementById('sigConfidence').textContent = `${confidence}%`;
+            document.getElementById('confidenceBar').style.width = `${confidence}%`;
+
+            document.getElementById('indRsi').textContent = rsiLabel;
+            document.getElementById('indEma').textContent = emaLabel;
+            document.getElementById('indEma').className = `text-xs sm:text-sm font-bold mt-0.5 ${isCall ? 'text-emerald-400' : 'text-rose-400'}`;
+            document.getElementById('indMacd').textContent = macdVal;
+
+            const directionBox = document.getElementById('directionBox');
+            const sigDirectionText = document.getElementById('sigDirectionText');
+            const sigTamilAction = document.getElementById('sigTamilAction');
+            const sigDirectionIcon = document.getElementById('sigDirectionIcon');
+            const statusPill = document.getElementById('signalStatusPill');
+
+            if (isCall) {
+                directionBox.className = 'rounded-2xl p-4 border flex items-center justify-between bg-emerald-500/15 border-emerald-500/40 glow-call';
+                sigDirectionText.textContent = 'CALL (UP)';
+                sigDirectionText.className = 'text-2xl sm:text-3xl font-black tracking-tight text-emerald-400 mt-0.5';
+                sigTamilAction.textContent = 'மேலே செல்லும் (Buy / Higher)';
+                sigTamilAction.className = 'text-xs font-semibold text-emerald-300 mt-0.5';
+                sigDirectionIcon.className = 'w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500 text-gray-950 flex items-center justify-center text-2xl sm:text-3xl shadow-lg';
+                sigDirectionIcon.innerHTML = '<i class="fa-solid fa-arrow-trend-up"></i>';
+            } else {
+                directionBox.className = 'rounded-2xl p-4 border flex items-center justify-between bg-rose-500/15 border-rose-500/40 glow-put';
+                sigDirectionText.textContent = 'PUT (DOWN)';
+                sigDirectionText.className = 'text-2xl sm:text-3xl font-black tracking-tight text-rose-400 mt-0.5';
+                sigTamilAction.textContent = 'கீழே செல்லும் (Sell / Lower)';
+                sigTamilAction.className = 'text-xs font-semibold text-rose-300 mt-0.5';
+                sigDirectionIcon.className = 'w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-rose-500 text-white flex items-center justify-center text-2xl sm:text-3xl shadow-lg';
+                sigDirectionIcon.innerHTML = '<i class="fa-solid fa-arrow-trend-down"></i>';
+            }
+
+            statusPill.textContent = 'LIVE SIGNAL ACTIVE';
+            statusPill.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse';
+
+            // Place Entry Marker on Candlestick Chart
+            state.entryMarker = {
+                index: state.candles.length - 1,
+                price: state.currentPrice,
+                direction: direction
+            };
+            drawChart();
+
+            // Add to Signal History Table
+            const newSignalObj = {
+                id: Date.now(),
+                asset: state.selectedAsset,
+                entryTime: entryTimeStr,
+                expiry: `${state.selectedTimeframe} Min`,
+                direction: direction,
+                strategy: 'AI Multi-Indicator',
+                status: 'PENDING'
+            };
+            state.history.unshift(newSignalObj);
+            renderHistoryTable();
+
+            // Play Sound & Show Toast
+            playSignalSound('signal');
+            showToast(`${state.selectedAsset} - ${direction} சிக்னல் உருவாக்கப்பட்டது!`, 'success');
+
+            // Start Countdown Timer
+            startSignalCountdown(newSignalObj.id);
+        }
+
+        function startSignalCountdown(signalId) {
+            if (state.countdownInterval) clearInterval(state.countdownInterval);
+
+            const countdownEl = document.getElementById('countdownTimer');
+            const countdownLabel = document.getElementById('countdownLabel');
+
+            state.countdownInterval = setInterval(() => {
+                const now = new Date();
+                const secsLeftInMinute = 60 - now.getSeconds();
+
+                if (secsLeftInMinute > 0) {
+                    countdownLabel.textContent = 'Entry Starts In / நுழைவு நேரம்';
+                    countdownEl.textContent = `00:${secsLeftInMinute.toString().padStart(2, '0')}`;
+                    countdownEl.className = 'font-mono text-lg font-extrabold text-sky-400';
+                } else {
+                    countdownLabel.textContent = 'Trade Running / வர்த்தகம் நடக்கிறது';
+                    countdownEl.textContent = 'ACTIVE';
+                    countdownEl.className = 'font-mono text-lg font-extrabold text-emerald-400 animate-pulse';
+                }
+            }, 1000);
+        }
+
+        // ==========================================
+        // 7. LIVE SIMULATED CANDLESTICK CHART
+        // ==========================================
+        function getDecimals(price) {
+            if (price < 0.001) return 6;
+            if (price >= 1000) return 2;
+            if (price >= 100) return 3;
+            return 5;
+        }
+
+        function initCandles() {
+            state.candles = [];
+            let price = state.basePrice;
+            const volatility = price * 0.00045;
+
+            for (let i = 0; i < 42; i++) {
+                const open = price;
+                const change = (Math.random() - 0.49) * volatility * 2.2;
+                const close = open + change;
+                const high = Math.max(open, close) + Math.random() * volatility;
+                const low = Math.min(open, close) - Math.random() * volatility;
+                state.candles.push({ open, high, low, close });
+                price = close;
+            }
+            state.currentPrice = price;
+            updateLivePriceTag();
+        }
+
+        function updateLivePriceTag() {
+            const decimals = getDecimals(state.currentPrice);
+            const priceEl = document.getElementById('livePriceDisplay');
+            const lastCandle = state.candles[state.candles.length - 1];
+            priceEl.textContent = state.currentPrice.toFixed(decimals);
+            priceEl.className = `font-mono text-sm font-bold ${lastCandle && lastCandle.close >= lastCandle.open ? 'text-emerald-400' : 'text-rose-400'}`;
+        }
+
+        // Simulate real-time price ticks every 1.2 seconds
+        setInterval(() => {
+            if (state.candles.length === 0) return;
+            const volatility = state.basePrice * 0.00035;
+            const last = state.candles[state.candles.length - 1];
+            const tick = (Math.random() - 0.495) * volatility;
+            
+            last.close += tick;
+            if (last.close > last.high) last.high = last.close;
+            if (last.close < last.low) last.low = last.close;
+            state.currentPrice = last.close;
+
+            // Every ~12 ticks, push a new candle
+            if (Math.random() < 0.14) {
+                state.candles.shift();
+                if (state.entryMarker && state.entryMarker.index > 0) {
+                    state.entryMarker.index -= 1;
+                }
+                state.candles.push({
+                    open: last.close,
+                    high: last.close + Math.random() * (volatility * 0.5),
+                    low: last.close - Math.random() * (volatility * 0.5),
+                    close: last.close
+                });
+            }
+
+            updateLivePriceTag();
+            drawChart();
+        }, 1200);
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            drawChart();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawChart() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            if (width === 0 || height === 0 || state.candles.length === 0) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate min/max price for scaling
+            let minPrice = Infinity;
+            let maxPrice = -Infinity;
+            state.candles.forEach(c => {
+                if (c.low < minPrice) minPrice = c.low;
+                if (c.high > maxPrice) maxPrice = c.high;
+            });
+            const paddingPrice = (maxPrice - minPrice) * 0.15 || state.basePrice * 0.001;
+            minPrice -= paddingPrice;
+            maxPrice += paddingPrice;
+
+            const padLeft = 14;
+            const padRight = 72;
+            const padTop = 20;
+            const padBottom = 20;
+            const chartW = width - padLeft - padRight;
+            const chartH = height - padTop - padBottom;
+
+            const priceToY = (p) => padTop + chartH - ((p - minPrice) / (maxPrice - minPrice)) * chartH;
+
+            // 1. Draw Horizontal Grid Lines & Right Axis Price Labels
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            ctx.font = '11px ui-monospace, SFMono-Regular, monospace';
+            ctx.fillStyle = '#6b7280';
+            ctx.textAlign = 'left';
+
+            const decimals = getDecimals(state.currentPrice);
+            const gridSteps = 5;
+            for (let i = 0; i <= gridSteps; i++) {
+                const y = padTop + (chartH / gridSteps) * i;
+                const priceVal = maxPrice - ((maxPrice - minPrice) / gridSteps) * i;
+
+                ctx.beginPath();
+                ctx.moveTo(padLeft, y);
+                ctx.lineTo(width - padRight, y);
+                ctx.stroke();
+
+                ctx.fillText(priceVal.toFixed(decimals), width - padRight + 6, y + 4);
+            }
+
+            // 2. Draw Candlesticks
+            const count = state.candles.length;
+            const stepX = chartW / count;
+            const candleWidth = Math.max(4, stepX * 0.62);
+
+            const emaPoints = [];
+            let ema = state.candles[0].close;
+            const k = 2 / (9 + 1);
+
+            state.candles.forEach((c, idx) => {
+                const xCenter = padLeft + idx * stepX + stepX / 2;
+                const yOpen = priceToY(c.open);
+                const yClose = priceToY(c.close);
+                const yHigh = priceToY(c.high);
+                const yLow = priceToY(c.low);
+
+                const isBullish = c.close >= c.open;
+                const color = isBullish ? '#10b981' : '#f43f5e';
+
+                // Wick
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.moveTo(xCenter, yHigh);
+                ctx.lineTo(xCenter, yLow);
+                ctx.stroke();
+
+                // Body
+                ctx.fillStyle = color;
+                const bodyTop = Math.min(yOpen, yClose);
+                const bodyHeight = Math.max(2, Math.abs(yClose - yOpen));
+                ctx.fillRect(xCenter - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+
+                // Calculate EMA 9
+                ema = c.close * k + ema * (1 - k);
+                emaPoints.push({ x: xCenter, y: priceToY(ema) });
+            });
+
+            // 3. Draw EMA 9 Trend Line
+            if (emaPoints.length > 1) {
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                emaPoints.forEach((pt, i) => {
+                    if (i === 0) ctx.moveTo(pt.x, pt.y);
+                    else ctx.lineTo(pt.x, pt.y);
+                });
+                ctx.stroke();
+            }
+
+            // 4. Draw Current Price Dashed Line & Badge
+            const currentY = priceToY(state.currentPrice);
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padLeft, currentY);
+            ctx.lineTo(width - padRight, currentY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Price Tag Pill on Right Axis
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(width - padRight + 2, currentY - 9, padRight - 4, 18);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 10px ui-monospace, monospace';
+            ctx.fillText(state.currentPrice.toFixed(decimals), width - padRight + 6, currentY + 3.5);
+
+            // 5. Draw Signal Entry Marker (if active)
+            if (state.entryMarker && state.entryMarker.index >= 0 && state.entryMarker.index < count) {
+                const mx = padLeft + state.entryMarker.index * stepX + stepX / 2;
+                const my = priceToY(state.entryMarker.price);
+                const isCall = state.entryMarker.direction === 'CALL';
+
+                ctx.fillStyle = isCall ? '#10b981' : '#f43f5e';
+                ctx.beginPath();
+                if (isCall) {
+                    ctx.moveTo(mx, my + 12);
+                    ctx.lineTo(mx - 7, my + 24);
+                    ctx.lineTo(mx + 7, my + 24);
+                } else {
+                    ctx.moveTo(mx, my - 12);
+                    ctx.lineTo(mx - 7, my - 24);
+                    ctx.lineTo(mx + 7, my - 24);
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        // ==========================================
+        // 8. SIGNAL HISTORY & WIN-RATE ANALYTICS
+        // ==========================================
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            let wins = 0;
+            let losses = 0;
+
+            state.history.forEach(item => {
+                if (item.status === 'WIN') wins++;
+                if (item.status === 'LOSS') losses++;
+
+                const isCall = item.direction === 'CALL';
+                const dirBadge = isCall
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold text-xs"><i class="fa-solid fa-arrow-up"></i> CALL</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold text-xs"><i class="fa-solid fa-arrow-down"></i> PUT</span>`;
+
+                let statusHtml = '';
+                if (item.status === 'PENDING') {
+                    statusHtml = `
+                        <div class="inline-flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[11px] font-semibold mr-1">Pending</span>
+                            <button onclick="resolveSignal(${item.id}, 'WIN')" class="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-gray-950 border border-emerald-500/40 text-xs font-bold transition" title="Mark as Win">
+                                Win
+                            </button>
+                            <button onclick="resolveSignal(${item.id}, 'LOSS')" class="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/40 text-xs font-bold transition" title="Mark as Loss">
+                                Loss
+                            </button>
+                        </div>
+                    `;
+                } else if (item.status === 'WIN') {
+                    statusHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-extrabold text-xs"><i class="fa-solid fa-circle-check"></i> WIN (ITM)</span>`;
+                } else {
+                    statusHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-400 font-extrabold text-xs"><i class="fa-solid fa-circle-xmark"></i> LOSS (OTM)</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-800/30 transition';
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-bold text-white whitespace-nowrap">${item.asset}</td>
+                    <td class="py-3.5 px-4 font-mono text-gray-300 whitespace-nowrap">${item.entryTime}</td>
+                    <td class="py-3.5 px-4 text-gray-300 whitespace-nowrap">${item.expiry}</td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">${dirBadge}</td>
+                    <td class="py-3.5 px-4 text-gray-400 text-xs whitespace-nowrap">${item.strategy}</td>
+                    <td class="py-3.5 px-4 text-right whitespace-nowrap">${statusHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Stats
+            const totalResolved = wins + losses;
+            const winRate = totalResolved > 0 ? Math.round((wins / totalResolved) * 100) : 0;
+
+            document.getElementById('statTotal').textContent = state.history.length;
+            document.getElementById('statWins').textContent = wins;
+            document.getElementById('statLosses').textContent = losses;
+            document.getElementById('statWinRate').textContent = `${winRate}%`;
+        }
+
+        window.resolveSignal = function(id, outcome) {
+            const target = state.history.find(h => h.id === id);
+            if (target) {
+                target.status = outcome;
+                renderHistoryTable();
+                if (outcome === 'WIN') {
+                    playSignalSound('win');
+                    showToast(`${target.asset} - WIN எனப் பதிவு செய்யப்பட்டது!`, 'success');
+                } else {
+                    showToast(`${target.asset} - LOSS எனப் பதிவு செய்யப்பட்டது.`, 'info');
+                }
+            }
+        };
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            state.history = [];
+            renderHistoryTable();
+            showToast('சிக்னல் வரலாறு அழிக்கப்பட்டது (History Cleared)', 'info');
+        });
+
+        // ==========================================
+        // 9. INITIALIZE ON WINDOW LOAD
+        // ==========================================
+        window.onload = function() {
+            initCandles();
+            resizeCanvas();
+            renderHistoryTable();
+        };
+    </script>
+</body>
+</html>
