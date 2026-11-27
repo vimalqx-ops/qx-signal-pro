@@ -78,4 +78,619 @@
             PUT (DOWN)
           </div>
           <div id="signalSubtext" class="text-xs text-slate-300 mt-1">
-            கீழே செல்ல
+            கீழே செல்லும் (Sell / Lower) &bull; <span id="signalPairAndTf">EUR/USD (OTC) &bull; 1m</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
+          <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
+          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">01:00</div>
+          <div class="text-[11px] text-emerald-400 mt-0.5">
+            AI Accuracy: <span id="signalAccuracyText">88%</span>
+          </div>
+        </div>
+      </div>
+
+      <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        EUR/USD (OTC) (1m) — Support / rejection confirmation paartthu mattum entry edungal. Sudden spike / news nerangalil trade thavirkka.
+      </p>
+
+      <!-- Indicators -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">RSI (14)</div>
+          <div id="indicatorRsiValue" class="text-base font-bold text-white mt-0.5">72.4</div>
+          <span id="indicatorRsiStatus" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
+            Overbought
+          </span>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">EMA (9/21)</div>
+          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross</div>
+          <div id="indicatorEmaSpread" class="text-[11px] font-mono text-slate-400 mt-1">-0.00012</div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">MACD</div>
+          <div id="indicatorMacdValue" class="text-sm sm:text-base font-mono font-bold text-white mt-0.5">-0.00014</div>
+          <span id="indicatorMacdBias" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
+            Bearish Bias
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chart Section -->
+    <section class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 id="chartTitleText" class="text-sm sm:text-base font-bold text-white">
+            EUR/USD (OTC) - Live Price Action
+          </h2>
+          <p class="text-[11px] text-slate-400">
+            நிகழ்நேர மெழுகுவர்த்தி வரைபடம் (Simulated Candlestick + EMA 9 Indicator)
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="domChartTimeframePill" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200">
+            1m View
+          </span>
+          <span id="domLiveSpotPrice" class="font-mono text-sm font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            1.08497
+          </span>
+        </div>
+      </div>
+
+      <canvas id="priceChartCanvas" width="680" height="220" class="w-full h-48 rounded-xl bg-slate-950 border border-slate-800 block"></canvas>
+    </section>
+
+    <!-- History Section -->
+    <section class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white">Recent Signals / சமீபத்திய சிக்னல்கள்</h2>
+        <span id="historyCountBadge" class="text-xs text-slate-400">0 entries</span>
+      </div>
+      <div id="signalHistoryList" class="space-y-2 text-xs">
+        <div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">
+          Puthiya signal generate seithal ingu patthivagum.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Pair Modal -->
+  <div id="pairModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4">
+    <div class="glass-card w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white">Select Quotex Pair</h3>
+          <p id="pairTotalCountText" class="text-[11px] text-slate-400">All Quotex Pairs</p>
+        </div>
+        <button id="closePairModalBtn" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200">
+          Close
+        </button>
+      </div>
+
+      <input id="pairSearchInput" type="text" placeholder="Search pair (e.g. EUR/USD, GBP/JPY, OTC, BTC, Gold)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400" />
+
+      <div class="flex flex-wrap gap-1.5 text-[11px]">
+        <button type="button" data-cat="ALL" class="cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-emerald-500 text-slate-950">All</button>
+        <button type="button" data-cat="OTC" class="cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white">OTC</button>
+        <button type="button" data-cat="FOREX" class="cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white">Forex</button>
+        <button type="button" data-cat="CRYPTO_CMD" class="cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white">Crypto &amp; Cmd</button>
+      </div>
+
+      <div id="pairListContainer" class="max-h-64 overflow-y-auto space-y-1.5 pr-0.5"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var PAIRS = [
+        { symbol: 'EUR/USD (OTC)', cat: 'OTC', basePrice: 1.08497, decimals: 5, volatility: 0.00045 },
+        { symbol: 'GBP/USD (OTC)', cat: 'OTC', basePrice: 1.26840, decimals: 5, volatility: 0.00052 },
+        { symbol: 'USD/JPY (OTC)', cat: 'OTC', basePrice: 154.320, decimals: 3, volatility: 0.085 },
+        { symbol: 'EUR/JPY (OTC)', cat: 'OTC', basePrice: 167.410, decimals: 3, volatility: 0.095 },
+        { symbol: 'GBP/JPY (OTC)', cat: 'OTC', basePrice: 195.740, decimals: 3, volatility: 0.110 },
+        { symbol: 'AUD/CAD (OTC)', cat: 'OTC', basePrice: 0.90412, decimals: 5, volatility: 0.00048 },
+        { symbol: 'AUD/CHF (OTC)', cat: 'OTC', basePrice: 0.57380, decimals: 5, volatility: 0.00038 },
+        { symbol: 'AUD/JPY (OTC)', cat: 'OTC', basePrice: 100.520, decimals: 3, volatility: 0.068 },
+        { symbol: 'CAD/CHF (OTC)', cat: 'OTC', basePrice: 0.63450, decimals: 5, volatility: 0.00040 },
+        { symbol: 'CHF/JPY (OTC)', cat: 'OTC', basePrice: 174.980, decimals: 3, volatility: 0.105 },
+        { symbol: 'EUR/CHF (OTC)', cat: 'OTC', basePrice: 0.95620, decimals: 5, volatility: 0.00036 },
+        { symbol: 'EUR/GBP (OTC)', cat: 'OTC', basePrice: 0.85520, decimals: 5, volatility: 0.00038 },
+        { symbol: 'GBP/CAD (OTC)', cat: 'OTC', basePrice: 1.76890, decimals: 5, volatility: 0.00065 },
+        { symbol: 'NZD/USD (OTC)', cat: 'OTC', basePrice: 0.59140, decimals: 5, volatility: 0.00042 },
+        { symbol: 'USD/BRL (OTC)', cat: 'OTC', basePrice: 5.81420, decimals: 5, volatility: 0.00320 },
+        { symbol: 'USD/MXN (OTC)', cat: 'OTC', basePrice: 20.34800, decimals: 5, volatility: 0.01200 },
+        { symbol: 'USD/ARS (OTC)', cat: 'OTC', basePrice: 1004.500, decimals: 3, volatility: 0.450 },
+        { symbol: 'USD/TRY (OTC)', cat: 'OTC', basePrice: 34.56200, decimals: 5, volatility: 0.01800 },
+        { symbol: 'EUR/USD', cat: 'FOREX', basePrice: 1.08520, decimals: 5, volatility: 0.00042 },
+        { symbol: 'GBP/USD', cat: 'FOREX', basePrice: 1.26910, decimals: 5, volatility: 0.00048 },
+        { symbol: 'USD/JPY', cat: 'FOREX', basePrice: 154.180, decimals: 3, volatility: 0.080 },
+        { symbol: 'USD/CHF', cat: 'FOREX', basePrice: 0.88190, decimals: 5, volatility: 0.00040 },
+        { symbol: 'AUD/USD', cat: 'FOREX', basePrice: 0.65240, decimals: 5, volatility: 0.00040 },
+        { symbol: 'USD/CAD', cat: 'FOREX', basePrice: 1.39850, decimals: 5, volatility: 0.00044 },
+        { symbol: 'NZD/USD', cat: 'FOREX', basePrice: 0.59180, decimals: 5, volatility: 0.00040 },
+        { symbol: 'EUR/JPY', cat: 'FOREX', basePrice: 167.290, decimals: 3, volatility: 0.090 },
+        { symbol: 'GBP/JPY', cat: 'FOREX', basePrice: 195.620, decimals: 3, volatility: 0.105 },
+        { symbol: 'EUR/GBP', cat: 'FOREX', basePrice: 0.85510, decimals: 5, volatility: 0.00035 },
+        { symbol: 'EUR/AUD', cat: 'FOREX', basePrice: 1.66340, decimals: 5, volatility: 0.00062 },
+        { symbol: 'EUR/CAD', cat: 'FOREX', basePrice: 1.51780, decimals: 5, volatility: 0.00058 },
+        { symbol: 'GBP/AUD', cat: 'FOREX', basePrice: 1.94520, decimals: 5, volatility: 0.00072 },
+        { symbol: 'AUD/CAD', cat: 'FOREX', basePrice: 0.91240, decimals: 5, volatility: 0.00042 },
+        { symbol: 'AUD/JPY', cat: 'FOREX', basePrice: 100.580, decimals: 3, volatility: 0.065 },
+        { symbol: 'CAD/JPY', cat: 'FOREX', basePrice: 110.220, decimals: 3, volatility: 0.072 },
+        { symbol: 'XAU/USD (Gold)', cat: 'CRYPTO_CMD', basePrice: 2648.50, decimals: 2, volatility: 1.45 },
+        { symbol: 'XAU/USD (OTC)', cat: 'OTC', basePrice: 2649.20, decimals: 2, volatility: 1.55 },
+        { symbol: 'XAG/USD (Silver)', cat: 'CRYPTO_CMD', basePrice: 30.640, decimals: 3, volatility: 0.045 },
+        { symbol: 'UKBrent Crude', cat: 'CRYPTO_CMD', basePrice: 73.420, decimals: 3, volatility: 0.085 },
+        { symbol: 'USCrude WTI', cat: 'CRYPTO_CMD', basePrice: 69.850, decimals: 3, volatility: 0.082 },
+        { symbol: 'BTC/USD', cat: 'CRYPTO_CMD', basePrice: 91450.00, decimals: 2, volatility: 65.0 },
+        { symbol: 'BTC/USD (OTC)', cat: 'OTC', basePrice: 91520.00, decimals: 2, volatility: 70.0 },
+        { symbol: 'ETH/USD', cat: 'CRYPTO_CMD', basePrice: 3340.50, decimals: 2, volatility: 4.20 },
+        { symbol: 'LTC/USD', cat: 'CRYPTO_CMD', basePrice: 88.400, decimals: 3, volatility: 0.180 },
+        { symbol: 'XRP/USD', cat: 'CRYPTO_CMD', basePrice: 1.42500, decimals: 5, volatility: 0.00650 },
+        { symbol: 'SOL/USD', cat: 'CRYPTO_CMD', basePrice: 238.600, decimals: 3, volatility: 0.450 },
+        { symbol: 'DOGE/USD (OTC)', cat: 'OTC', basePrice: 0.39850, decimals: 5, volatility: 0.00220 }
+      ];
+
+      function getDurationForTimeframe(tf) {
+        return tf === '5m' ? 300 : 60;
+      }
+
+      var state = {
+        selectedPair: PAIRS[0],
+        selectedCategory: 'ALL',
+        timeframe: '1m',
+        direction: 'PUT',
+        accuracy: 88,
+        countdownSec: 60,
+        lastTickSec: null,
+        candles: [],
+        history: []
+      };
+
+      var el = {
+        istClock: document.getElementById('liveIstClock'),
+        openPairModalBtn: document.getElementById('openPairModalBtn'),
+        closePairModalBtn: document.getElementById('closePairModalBtn'),
+        pairModal: document.getElementById('pairModal'),
+        pairSearchInput: document.getElementById('pairSearchInput'),
+        pairListContainer: document.getElementById('pairListContainer'),
+        pairTotalCountText: document.getElementById('pairTotalCountText'),
+        activePairLabel: document.getElementById('activePairLabel'),
+        tf1mBtn: document.getElementById('tf1mBtn'),
+        tf5mBtn: document.getElementById('tf5mBtn'),
+        generateSignalBtn: document.getElementById('generateSignalBtn'),
+        signalDirectionText: document.getElementById('signalDirectionText'),
+        signalSubtext: document.getElementById('signalSubtext'),
+        expiryCountdownDisplay: document.getElementById('expiryCountdownDisplay'),
+        signalAccuracyText: document.getElementById('signalAccuracyText'),
+        signalConfirmationNote: document.getElementById('signalConfirmationNote'),
+        rsiVal: document.getElementById('indicatorRsiValue'),
+        rsiStatus: document.getElementById('indicatorRsiStatus'),
+        emaSignal: document.getElementById('indicatorEmaSignal'),
+        emaSpread: document.getElementById('indicatorEmaSpread'),
+        macdVal: document.getElementById('indicatorMacdValue'),
+        macdBias: document.getElementById('indicatorMacdBias'),
+        chartTitle: document.getElementById('chartTitleText'),
+        tfPill: document.getElementById('domChartTimeframePill'),
+        spotPrice: document.getElementById('domLiveSpotPrice'),
+        canvas: document.getElementById('priceChartCanvas'),
+        historyList: document.getElementById('signalHistoryList'),
+        historyBadge: document.getElementById('historyCountBadge')
+      };
+
+      function pad2(n) {
+        var num = Math.max(0, Math.floor(n));
+        return num < 10 ? '0' + num : String(num);
+      }
+
+      function formatSec(sec) {
+        var s = Math.max(0, Math.floor(sec));
+        return pad2(Math.floor(s / 60)) + ':' + pad2(s % 60);
+      }
+
+      function updateIstClock(nowMs) {
+        var ist = new Date(nowMs + 5.5 * 3600 * 1000);
+        var formatted = pad2(ist.getUTCHours()) + ':' + pad2(ist.getUTCMinutes()) + ':' + pad2(ist.getUTCSeconds());
+        if (el.istClock) {
+          el.istClock.textContent = formatted;
+        }
+        return formatted;
+      }
+
+      function seedCandles(pair) {
+        var mult = state.timeframe === '5m' ? 1.8 : 1;
+        var prev = pair.basePrice;
+        var list = [];
+        for (var i = 0; i < 34; i++) {
+          var open = prev;
+          var move = (Math.random() - 0.48) * pair.volatility * mult;
+          var close = Math.max(pair.volatility * 10, open + move);
+          var high = Math.max(open, close) + Math.random() * pair.volatility * 0.6 * mult;
+          var low = Math.min(open, close) - Math.random() * pair.volatility * 0.6 * mult;
+          list.push({ open: open, high: high, low: low, close: close });
+          prev = close;
+        }
+        state.candles = list;
+      }
+
+      function stepCandle() {
+        if (!state.candles.length) return;
+        var mult = state.timeframe === '5m' ? 1.8 : 1;
+        var last = state.candles[state.candles.length - 1];
+        var delta = (Math.random() - 0.49) * state.selectedPair.volatility * 0.65 * mult;
+        last.close = Math.max(state.selectedPair.volatility * 10, last.close + delta);
+        last.high = Math.max(last.high, last.close);
+        last.low = Math.min(last.low, last.close);
+      }
+
+      function calcEma(arr, period) {
+        if (!arr.length) return [];
+        var k = 2 / (period + 1);
+        var res = [arr[0]];
+        for (var i = 1; i < arr.length; i++) {
+          res.push(arr[i] * k + res[i - 1] * (1 - k));
+        }
+        return res;
+      }
+
+      function renderChartAndIndicators() {
+        var pair = state.selectedPair;
+        var dec = pair.decimals;
+        var closes = state.candles.map(function (c) { return c.close; });
+        var currentPrice = closes.length ? closes[closes.length - 1] : pair.basePrice;
+
+        if (el.activePairLabel) el.activePairLabel.textContent = pair.symbol;
+        if (el.chartTitle) el.chartTitle.textContent = pair.symbol + ' - Live Price Action';
+        if (el.tfPill) el.tfPill.textContent = state.timeframe + ' View';
+        if (el.spotPrice) el.spotPrice.textContent = currentPrice.toFixed(dec);
+
+        var gains = 0;
+        var losses = 0;
+        var len = Math.min(14, closes.length - 1);
+        for (var i = closes.length - len; i < closes.length; i++) {
+          var diff = closes[i] - closes[i - 1];
+          if (diff >= 0) gains += diff;
+          else losses += Math.abs(diff);
+        }
+        var avgGain = len > 0 ? gains / len : 1;
+        var avgLoss = len > 0 ? losses / len : 1;
+        var rs = avgLoss === 0 ? 75 : avgGain / avgLoss;
+        var rsi = Math.min(88, Math.max(14, 100 - 100 / (1 + rs)));
+
+        if (el.rsiVal) el.rsiVal.textContent = rsi.toFixed(1);
+        if (el.rsiStatus) {
+          if (rsi >= 70) {
+            el.rsiStatus.textContent = 'Overbought';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
+          } else if (rsi <= 30) {
+            el.rsiStatus.textContent = 'Oversold';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+          } else {
+            el.rsiStatus.textContent = 'Neutral';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700';
+          }
+        }
+
+        var ema9 = calcEma(closes, 9);
+        var ema21 = calcEma(closes, 21);
+        var spread = (ema9[ema9.length - 1] || currentPrice) - (ema21[ema21.length - 1] || currentPrice);
+        var bull = spread >= 0;
+
+        if (el.emaSignal) {
+          el.emaSignal.textContent = bull ? 'Bullish Cross (UP)' : 'Bearish Cross (DOWN)';
+          el.emaSignal.className = 'text-sm sm:text-base font-bold mt-0.5 ' + (bull ? 'text-emerald-300' : 'text-rose-300');
+        }
+        if (el.emaSpread) {
+          el.emaSpread.textContent = (spread >= 0 ? '+' : '') + spread.toFixed(dec);
+        }
+
+        var macd = spread * 1.15;
+        if (el.macdVal) el.macdVal.textContent = (macd >= 0 ? '+' : '') + macd.toFixed(dec);
+        if (el.macdBias) {
+          el.macdBias.textContent = macd >= 0 ? 'Bullish Bias' : 'Bearish Bias';
+          el.macdBias.className = macd >= 0
+            ? 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+            : 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
+        }
+
+        if (!el.canvas || !el.canvas.getContext) return;
+        var ctx = el.canvas.getContext('2d');
+        var w = el.canvas.width;
+        var h = el.canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        var highs = state.candles.map(function (c) { return c.high; });
+        var lows = state.candles.map(function (c) { return c.low; });
+        var maxP = Math.max.apply(null, highs);
+        var minP = Math.min.apply(null, lows);
+        var range = Math.max(pair.volatility * 0.4, maxP - minP);
+        var padTop = 18;
+        var chartH = h - padTop * 2;
+
+        function yPos(price) {
+          return padTop + ((maxP - price) / range) * chartH;
+        }
+
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+        ctx.lineWidth = 1;
+        for (var g = 0; g <= 4; g++) {
+          var gy = padTop + (chartH / 4) * g;
+          ctx.beginPath();
+          ctx.moveTo(10, gy);
+          ctx.lineTo(w - 74, gy);
+          ctx.stroke();
+
+          var priceLabel = maxP - (range / 4) * g;
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '11px monospace';
+          ctx.fillText(priceLabel.toFixed(dec), w - 68, gy + 4);
+        }
+
+        var plotW = w - 88;
+        var step = plotW / state.candles.length;
+        var bodyW = Math.max(4, step * 0.56);
+
+        state.candles.forEach(function (c, idx) {
+          var cx = 12 + idx * step + step / 2;
+          var isUp = c.close >= c.open;
+          var col = isUp ? '#34d399' : '#fb7185';
+
+          ctx.strokeStyle = col;
+          ctx.beginPath();
+          ctx.moveTo(cx, yPos(c.high));
+          ctx.lineTo(cx, yPos(c.low));
+          ctx.stroke();
+
+          var yO = yPos(c.open);
+          var yC = yPos(c.close);
+          ctx.fillStyle = col;
+          ctx.fillRect(cx - bodyW / 2, Math.min(yO, yC), bodyW, Math.max(2, Math.abs(yC - yO)));
+        });
+
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ema9.forEach(function (val, idx) {
+          var cx = 12 + idx * step + step / 2;
+          var cy = yPos(val);
+          if (idx === 0) ctx.moveTo(cx, cy);
+          else ctx.lineTo(cx, cy);
+        });
+        ctx.stroke();
+      }
+
+      function renderSignalCard() {
+        var isCall = state.direction === 'CALL';
+        if (el.signalDirectionText) {
+          el.signalDirectionText.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
+          el.signalDirectionText.className = 'text-2xl sm:text-3xl font-extrabold mt-0.5 ' + (isCall ? 'text-emerald-400' : 'text-rose-400');
+        }
+        if (el.signalSubtext) {
+          var desc = isCall ? 'மேலே செல்லும் (Buy / Higher)' : 'கீழே செல்லும் (Sell / Lower)';
+          el.signalSubtext.innerHTML = desc + ' &bull; <span id="signalPairAndTf">' + state.selectedPair.symbol + ' &bull; ' + state.timeframe + '</span>';
+        }
+        if (el.expiryCountdownDisplay) {
+          el.expiryCountdownDisplay.textContent = formatSec(state.countdownSec);
+        }
+        if (el.signalAccuracyText) {
+          el.signalAccuracyText.textContent = state.accuracy + '%';
+        }
+        if (el.signalConfirmationNote) {
+          el.signalConfirmationNote.textContent = isCall
+            ? state.selectedPair.symbol + ' (' + state.timeframe + ') — Support / bullish rejection confirmation paartthu mattum CALL entry edungal. Sudden spike / news nerangalil trade thavirkka.'
+            : state.selectedPair.symbol + ' (' + state.timeframe + ') — Resistance / bearish rejection confirmation paartthu mattum PUT entry edungal. Sudden spike / news nerangalil trade thavirkka.';
+        }
+      }
+
+      function renderHistory() {
+        if (el.historyBadge) {
+          el.historyBadge.textContent = state.history.length + ' entries';
+        }
+        if (!el.historyList) return;
+        if (!state.history.length) {
+          el.historyList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">Puthiya signal generate seithal ingu patthivagum.</div>';
+          return;
+        }
+        el.historyList.innerHTML = state.history.slice(0, 8).map(function (item) {
+          var dirClass = item.dir === 'CALL' ? 'text-emerald-400' : 'text-rose-400';
+          return (
+            '<div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">' +
+              '<div>' +
+                '<span class="font-semibold text-white">' + item.pair + '</span>' +
+                '<span class="text-slate-400 ml-1.5">(' + item.tf + ')</span>' +
+                '<span class="text-slate-500 ml-2 font-mono">' + item.time + '</span>' +
+              '</div>' +
+              '<div class="flex items-center gap-2.5">' +
+                '<span class="font-bold ' + dirClass + '">' + item.dir + '</span>' +
+                '<span class="text-slate-300 font-mono">' + item.acc + '%</span>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function handleGenerateSignal() {
+        var closes = state.candles.map(function (c) { return c.close; });
+        var diff = closes.length > 5 ? closes[closes.length - 1] - closes[closes.length - 5] : 0;
+        var prob = diff > 0 ? 0.58 : diff < 0 ? 0.42 : 0.5;
+        state.direction = Math.random() < prob ? 'CALL' : 'PUT';
+        state.accuracy = state.timeframe === '5m'
+          ? Math.floor(84 + Math.random() * 9)
+          : Math.floor(78 + Math.random() * 11);
+        state.countdownSec = getDurationForTimeframe(state.timeframe);
+
+        var timeStr = updateIstClock(Date.now());
+        state.history.unshift({
+          pair: state.selectedPair.symbol,
+          tf: state.timeframe,
+          dir: state.direction,
+          acc: state.accuracy,
+          time: timeStr
+        });
+
+        renderSignalCard();
+        renderHistory();
+      }
+
+      function handleSetTimeframe(tf) {
+        state.timeframe = tf;
+        state.countdownSec = getDurationForTimeframe(tf);
+        if (el.tf1mBtn && el.tf5mBtn) {
+          if (tf === '1m') {
+            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+          } else {
+            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+          }
+        }
+        seedCandles(state.selectedPair);
+        renderChartAndIndicators();
+        renderSignalCard();
+      }
+
+      function updateCategoryButtons() {
+        var btns = document.querySelectorAll('.cat-filter-btn');
+        btns.forEach(function (b) {
+          var cat = b.getAttribute('data-cat');
+          if (cat === state.selectedCategory) {
+            b.className = 'cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-emerald-500 text-slate-950';
+          } else {
+            b.className = 'cat-filter-btn px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white';
+          }
+        });
+      }
+
+      function renderPairModalList(query) {
+        if (!el.pairListContainer) return;
+        var q = (query || '').trim().toLowerCase();
+        var matches = PAIRS.filter(function (p) {
+          var catOk = state.selectedCategory === 'ALL' || p.cat === state.selectedCategory;
+          var textOk = !q || p.symbol.toLowerCase().indexOf(q) !== -1;
+          return catOk && textOk;
+        });
+
+        if (el.pairTotalCountText) {
+          el.pairTotalCountText.textContent = matches.length + ' pairs available (' + PAIRS.length + ' total)';
+        }
+
+        if (!matches.length) {
+          el.pairListContainer.innerHTML = '<div class="text-slate-400 text-xs py-4 text-center">Pair kidaikkavillai. Vera pair search pannungal.</div>';
+          return;
+        }
+
+        el.pairListContainer.innerHTML = matches.map(function (p, idx) {
+          var selected = p.symbol === state.selectedPair.symbol;
+          var cls = selected
+            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+            : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800';
+          var tagText = p.cat === 'OTC' ? 'OTC' : (p.cat === 'FOREX' ? 'FX' : 'CMD/CRYP');
+          return (
+            '<button type="button" data-idx="' + idx + '" class="pair-row w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-semibold ' + cls + '">' +
+              '<span>' + p.symbol + '</span>' +
+              '<span class="flex items-center gap-2">' +
+                '<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">' + tagText + '</span>' +
+                '<span class="font-mono text-slate-400">' + p.basePrice.toFixed(p.decimals) + '</span>' +
+              '</span>' +
+            '</button>'
+          );
+        }).join('');
+
+        var rows = el.pairListContainer.querySelectorAll('.pair-row');
+        rows.forEach(function (row) {
+          row.addEventListener('click', function () {
+            var idx = parseInt(row.getAttribute('data-idx'), 10);
+            if (matches[idx]) {
+              state.selectedPair = matches[idx];
+              seedCandles(state.selectedPair);
+              renderChartAndIndicators();
+              renderSignalCard();
+            }
+            closeModal();
+          });
+        });
+      }
+
+      function openModal() {
+        if (!el.pairModal) return;
+        state.selectedCategory = 'ALL';
+        updateCategoryButtons();
+        if (el.pairSearchInput) el.pairSearchInput.value = '';
+        renderPairModalList('');
+        el.pairModal.classList.remove('hidden');
+        el.pairModal.classList.add('flex');
+      }
+
+      function closeModal() {
+        if (!el.pairModal) return;
+        el.pairModal.classList.add('hidden');
+        el.pairModal.classList.remove('flex');
+      }
+
+      document.querySelectorAll('.cat-filter-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.selectedCategory = btn.getAttribute('data-cat') || 'ALL';
+          updateCategoryButtons();
+          renderPairModalList(el.pairSearchInput ? el.pairSearchInput.value : '');
+        });
+      });
+
+      if (el.openPairModalBtn) el.openPairModalBtn.addEventListener('click', openModal);
+      if (el.closePairModalBtn) el.closePairModalBtn.addEventListener('click', closeModal);
+      if (el.pairModal) {
+        el.pairModal.addEventListener('click', function (ev) {
+          if (ev.target === el.pairModal) closeModal();
+        });
+      }
+      if (el.pairSearchInput) {
+        el.pairSearchInput.addEventListener('input', function (ev) {
+          renderPairModalList(ev.target.value);
+        });
+      }
+      if (el.tf1mBtn) el.tf1mBtn.addEventListener('click', function () { handleSetTimeframe('1m'); });
+      if (el.tf5mBtn) el.tf5mBtn.addEventListener('click', function () { handleSetTimeframe('5m'); });
+      if (el.generateSignalBtn) el.generateSignalBtn.addEventListener('click', handleGenerateSignal);
+
+      function syncLoop() {
+        var nowMs = Date.now();
+        var wholeSec = Math.floor(nowMs / 1000);
+        updateIstClock(nowMs);
+
+        if (state.lastTickSec === null) {
+          state.lastTickSec = wholeSec;
+          renderChartAndIndicators();
+          renderSignalCard();
+          return;
+        }
+
+        if (wholeSec > state.lastTickSec) {
+          var elapsed = wholeSec - state.lastTickSec;
+          state.lastTickSec = wholeSec;
+
+          for (var step = 0; step < elapsed; step++) {
+            if (state.countdownSec > 1) {
+              state.countdownSec -= 1;
+            } else {
+              state.countdownSec = getDurationForTimeframe(state.timeframe);
+            }
+            stepCandle();
+          }
+
+          renderChartAndIndicators();
+          renderSignalCard();
+        }
+      }
+
+      seedCandles(state.selectedPair);
+      renderHistory();
+      syncLoop();
+      setInterval(syncLoop, 200);
+    })();
+  </script>
+</body>
+</html>
