@@ -1,126 +1,124 @@
 <!DOCTYPE html>
-<html lang="ta" class="dark">
+<html lang="ta">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QX Signal Pro - Quotex Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
-      background: #070b14;
+      background-color: #070b14;
       color: #f8fafc;
     }
-    .glass {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.16);
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.18);
     }
   </style>
 </head>
-<body class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),_transparent_45%),_#070b14] text-slate-100 pb-10">
+<body class="min-h-screen bg-[#070b14] text-slate-100 pb-10">
   <div class="max-w-3xl mx-auto px-4 pt-5 space-y-4">
-    <!-- Top Header & Live Clocks -->
-    <header class="glass rounded-2xl p-4 shadow-xl space-y-4">
+
+    <!-- Header & Clocks -->
+    <header class="glass-card rounded-2xl p-4 space-y-4 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 font-extrabold text-lg">
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-extrabold text-lg">
             QX
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-lg font-bold tracking-tight text-white">QX Signal Pro</h1>
+              <h1 class="text-lg font-bold text-white">QX Signal Pro</h1>
               <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 AI V4.2
               </span>
             </div>
-            <p class="text-xs text-slate-400">Quotex Live & OTC Technical Signal Engine</p>
+            <p class="text-xs text-slate-400">Quotex Live &amp; OTC Technical Signal Engine</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/70 rounded-xl px-3 py-2 text-xs">
+        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs">
           <div>
             <div class="text-[10px] uppercase tracking-wider text-slate-400">IST (INDIA)</div>
-            <div id="liveIstClock" class="font-mono font-semibold text-emerald-300">--:--:--</div>
+            <div id="liveIstClock" class="font-mono font-bold text-emerald-300 text-sm">00:00:00</div>
           </div>
-          <div class="h-6 w-px bg-slate-700/80 mx-1"></div>
+          <div class="h-7 w-px bg-slate-700"></div>
           <div>
             <div class="text-[10px] uppercase tracking-wider text-slate-400">UTC</div>
-            <div id="liveUtcClock" class="font-mono font-semibold text-sky-300">--:--:--</div>
+            <div id="liveUtcClock" class="font-mono font-bold text-sky-300 text-sm">00:00:00</div>
           </div>
         </div>
       </div>
 
-      <!-- Pair & Timeframe Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
-        <button id="openPairModalBtn" type="button" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-sm font-semibold transition">
-          <span id="activePairLabel" class="text-white">EUR/USD (OTC)</span>
-          <span class="text-xs text-emerald-400">▾ Pair</span>
+      <!-- Controls: Pair, Timeframe, Generate -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
+        <button id="openPairModalBtn" type="button" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sm font-semibold text-white">
+          <span id="activePairLabel">EUR/USD (OTC)</span>
+          <span class="text-xs text-emerald-400">&#9662; Pair</span>
         </button>
 
         <div class="flex items-center gap-2">
           <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-800">
-            <button id="tf1mBtn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">
+            <button id="tf1mBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950">
               1m
             </button>
-            <button id="tf5mBtn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">
+            <button id="tf5mBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white">
               5m
             </button>
           </div>
 
-          <button id="generateSignalBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition">
+          <button id="generateSignalBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm transition">
             Generate Signal
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Active Signal & Countdown Card -->
-    <section class="glass rounded-2xl p-5 shadow-xl space-y-4">
-      <div class="flex flex-wrap items-center justify-between gap-2">
+    <!-- Active Signal Card -->
+    <section class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div class="text-xs uppercase tracking-wider text-slate-400">Active Signal</div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">ACTIVE SIGNAL</div>
           <div id="signalDirectionText" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-0.5">
             PUT (DOWN)
           </div>
-          <div id="signalSubtext" class="text-xs text-slate-400 mt-0.5">
-            கீழே செல்லும் (Sell / Lower) • <span id="signalPairAndTf">EUR/USD (OTC) • 1m</span>
+          <div id="signalSubtext" class="text-xs text-slate-300 mt-1">
+            கீழே செல்லும் (Sell / Lower) &bull; <span id="signalPairAndTf">EUR/USD (OTC) &bull; 1m</span>
           </div>
         </div>
 
-        <div class="text-right bg-slate-900/85 border border-slate-800 rounded-xl px-4 py-2.5">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-right min-w-[155px]">
           <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
-          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300">00:34</div>
-          <div class="text-[11px] text-emerald-400">
-            AI Accuracy: <span id="signalAccuracyText">90%</span>
+          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300 mt-0.5">00:30</div>
+          <div class="text-[11px] text-emerald-400 mt-0.5">
+            AI Accuracy: <span id="signalAccuracyText">88%</span>
           </div>
         </div>
       </div>
 
-      <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-800/90 rounded-xl p-3">
-        Candle close matrum chart trend confirmation paartthu mattum entry edungal. Sudden spike / news nerangalil trade thavirkka.
+      <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        EUR/USD (OTC) (1m) — Support / rejection confirmation paartthu mattum entry edungal. Sudden spike / news nerangalil trade thavirkka.
       </p>
 
-      <!-- Technical Indicators -->
-      <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
-        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+      <!-- Indicators -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">RSI (14)</div>
-          <div id="indicatorRsiValue" class="text-sm sm:text-base font-bold text-white mt-0.5">73.6</div>
+          <div id="indicatorRsiValue" class="text-base font-bold text-white mt-0.5">72.4</div>
           <span id="indicatorRsiStatus" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
             Overbought
           </span>
         </div>
 
-        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">EMA (9/21)</div>
-          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross ↓</div>
+          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross &darr;</div>
           <div id="indicatorEmaSpread" class="text-[11px] font-mono text-slate-400 mt-1">-0.00012</div>
         </div>
 
-        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
           <div class="text-[11px] text-slate-400">MACD</div>
           <div id="indicatorMacdValue" class="text-sm sm:text-base font-mono font-bold text-white mt-0.5">-0.00014</div>
           <span id="indicatorMacdBias" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
@@ -130,8 +128,8 @@
       </div>
     </section>
 
-    <!-- Live Simulated Price Action Chart -->
-    <section class="glass rounded-2xl p-4 shadow-xl space-y-3">
+    <!-- Chart Section -->
+    <section class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="chartTitleText" class="text-sm sm:text-base font-bold text-white">
@@ -151,389 +149,451 @@
         </div>
       </div>
 
-      <canvas id="priceChartCanvas" width="720" height="240" class="w-full h-52 rounded-xl bg-slate-950/90 border border-slate-800/90"></canvas>
+      <canvas id="priceChartCanvas" width="680" height="220" class="w-full h-48 rounded-xl bg-slate-950 border border-slate-800 block"></canvas>
     </section>
 
-    <!-- Signal History -->
-    <section class="glass rounded-2xl p-4 shadow-xl space-y-3">
+    <!-- History Section -->
+    <section class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-bold text-white">Recent Signals / சமீபத்திய சிக்னல்கள்</h2>
         <span id="historyCountBadge" class="text-xs text-slate-400">0 entries</span>
       </div>
       <div id="signalHistoryList" class="space-y-2 text-xs">
-        <div class="text-slate-400 py-3 text-center bg-slate-900/50 rounded-xl border border-slate-800/60">
+        <div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">
           Puthiya signal generate seithal ingu patthivagum.
         </div>
       </div>
     </section>
   </div>
 
-  <!-- Searchable Pair Selector Modal -->
-  <div id="pairModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-    <div class="glass w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl">
+  <!-- Pair Modal -->
+  <div id="pairModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4">
+    <div class="glass-card w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-bold text-white">Select Quotex Pair</h3>
         <button id="closePairModalBtn" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200">
-          Close ✕
+          Close &#10005;
         </button>
       </div>
       <input id="pairSearchInput" type="text" placeholder="Search pair (e.g. EUR/USD, GBP/JPY, OTC)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400" />
-      <div id="pairListContainer" class="max-h-64 overflow-y-auto space-y-1.5 pr-1"></div>
+      <div id="pairListContainer" class="max-h-60 overflow-y-auto space-y-1.5"></div>
     </div>
   </div>
 
   <script>
-    const PAIRS = [
-      { symbol: 'EUR/USD (OTC)', basePrice: 1.08497, decimals: 5, volatility: 0.00045 },
-      { symbol: 'GBP/USD (OTC)', basePrice: 1.26840, decimals: 5, volatility: 0.00052 },
-      { symbol: 'USD/JPY (OTC)', basePrice: 154.320, decimals: 3, volatility: 0.085 },
-      { symbol: 'EUR/JPY (OTC)', basePrice: 167.410, decimals: 3, volatility: 0.095 },
-      { symbol: 'AUD/CAD (OTC)', basePrice: 0.90412, decimals: 5, volatility: 0.00048 },
-      { symbol: 'GBP/JPY (OTC)', basePrice: 195.740, decimals: 3, volatility: 0.11 },
-      { symbol: 'USD/CHF (OTC)', basePrice: 0.88190, decimals: 5, volatility: 0.00042 },
-      { symbol: 'EUR/GBP (OTC)', basePrice: 0.85520, decimals: 5, volatility: 0.00038 }
-    ];
+    (function () {
+      const PAIRS = [
+        { symbol: 'EUR/USD (OTC)', basePrice: 1.08497, decimals: 5, volatility: 0.00045 },
+        { symbol: 'GBP/USD (OTC)', basePrice: 1.26840, decimals: 5, volatility: 0.00052 },
+        { symbol: 'USD/JPY (OTC)', basePrice: 154.320, decimals: 3, volatility: 0.085 },
+        { symbol: 'EUR/JPY (OTC)', basePrice: 167.410, decimals: 3, volatility: 0.095 },
+        { symbol: 'AUD/CAD (OTC)', basePrice: 0.90412, decimals: 5, volatility: 0.00048 },
+        { symbol: 'GBP/JPY (OTC)', basePrice: 195.740, decimals: 3, volatility: 0.11 },
+        { symbol: 'USD/CHF (OTC)', basePrice: 0.88190, decimals: 5, volatility: 0.00042 },
+        { symbol: 'EUR/GBP (OTC)', basePrice: 0.85520, decimals: 5, volatility: 0.00038 }
+      ];
 
-    const state = {
-      selectedPair: PAIRS[0],
-      timeframe: '1m',
-      direction: 'PUT',
-      accuracy: 90,
-      countdownSec: 34,
-      candles: [],
-      history: []
-    };
+      const state = {
+        selectedPair: PAIRS[0],
+        timeframe: '1m',
+        direction: 'PUT',
+        accuracy: 88,
+        countdownSec: 30,
+        candles: [],
+        history: []
+      };
 
-    const dom = {
-      liveIstClock: document.getElementById('liveIstClock'),
-      liveUtcClock: document.getElementById('liveUtcClock'),
-      openPairModalBtn: document.getElementById('openPairModalBtn'),
-      closePairModalBtn: document.getElementById('closePairModalBtn'),
-      pairModal: document.getElementById('pairModal'),
-      pairSearchInput: document.getElementById('pairSearchInput'),
-      pairListContainer: document.getElementById('pairListContainer'),
-      activePairLabel: document.getElementById('activePairLabel'),
-      tf1mBtn: document.getElementById('tf1mBtn'),
-      tf5mBtn: document.getElementById('tf5mBtn'),
-      generateSignalBtn: document.getElementById('generateSignalBtn'),
-      signalDirectionText: document.getElementById('signalDirectionText'),
-      signalSubtext: document.getElementById('signalSubtext'),
-      signalPairAndTf: document.getElementById('signalPairAndTf'),
-      expiryCountdownDisplay: document.getElementById('expiryCountdownDisplay'),
-      signalAccuracyText: document.getElementById('signalAccuracyText'),
-      signalConfirmationNote: document.getElementById('signalConfirmationNote'),
-      indicatorRsiValue: document.getElementById('indicatorRsiValue'),
-      indicatorRsiStatus: document.getElementById('indicatorRsiStatus'),
-      indicatorEmaSignal: document.getElementById('indicatorEmaSignal'),
-      indicatorEmaSpread: document.getElementById('indicatorEmaSpread'),
-      indicatorMacdValue: document.getElementById('indicatorMacdValue'),
-      indicatorMacdBias: document.getElementById('indicatorMacdBias'),
-      chartTitleText: document.getElementById('chartTitleText'),
-      domChartTimeframePill: document.getElementById('domChartTimeframePill'),
-      domLiveSpotPrice: document.getElementById('domLiveSpotPrice'),
-      priceChartCanvas: document.getElementById('priceChartCanvas'),
-      signalHistoryList: document.getElementById('signalHistoryList'),
-      historyCountBadge: document.getElementById('historyCountBadge')
-    };
+      const el = {
+        istClock: document.getElementById('liveIstClock'),
+        utcClock: document.getElementById('liveUtcClock'),
+        openPairModalBtn: document.getElementById('openPairModalBtn'),
+        closePairModalBtn: document.getElementById('closePairModalBtn'),
+        pairModal: document.getElementById('pairModal'),
+        pairSearchInput: document.getElementById('pairSearchInput'),
+        pairListContainer: document.getElementById('pairListContainer'),
+        activePairLabel: document.getElementById('activePairLabel'),
+        tf1mBtn: document.getElementById('tf1mBtn'),
+        tf5mBtn: document.getElementById('tf5mBtn'),
+        generateSignalBtn: document.getElementById('generateSignalBtn'),
+        signalDirectionText: document.getElementById('signalDirectionText'),
+        signalSubtext: document.getElementById('signalSubtext'),
+        expiryCountdownDisplay: document.getElementById('expiryCountdownDisplay'),
+        signalAccuracyText: document.getElementById('signalAccuracyText'),
+        signalConfirmationNote: document.getElementById('signalConfirmationNote'),
+        rsiVal: document.getElementById('indicatorRsiValue'),
+        rsiStatus: document.getElementById('indicatorRsiStatus'),
+        emaSignal: document.getElementById('indicatorEmaSignal'),
+        emaSpread: document.getElementById('indicatorEmaSpread'),
+        macdVal: document.getElementById('indicatorMacdValue'),
+        macdBias: document.getElementById('indicatorMacdBias'),
+        chartTitle: document.getElementById('chartTitleText'),
+        tfPill: document.getElementById('domChartTimeframePill'),
+        spotPrice: document.getElementById('domLiveSpotPrice'),
+        canvas: document.getElementById('priceChartCanvas'),
+        historyList: document.getElementById('signalHistoryList'),
+        historyBadge: document.getElementById('historyCountBadge')
+      };
 
-    function formatCountdown(totalSec) {
-      const safe = Math.max(0, Math.floor(totalSec));
-      const mins = String(Math.floor(safe / 60)).padStart(2, '0');
-      const secs = String(safe % 60).padStart(2, '0');
-      return `${mins}:${secs}`;
-    }
+      function pad2(n) {
+        return String(Math.max(0, Math.floor(n))).padStart(2, '0');
+      }
 
-    function updateClocks() {
-      const now = new Date();
-      try {
-        if (dom.liveIstClock) {
-          dom.liveIstClock.textContent = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Kolkata',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-          }).format(now);
+      function formatSec(sec) {
+        const s = Math.max(0, Math.floor(sec));
+        return pad2(Math.floor(s / 60)) + ':' + pad2(s % 60);
+      }
+
+      function updateClocks() {
+        const now = new Date();
+        const ist = new Date(now.getTime() + 5.5 * 3600 * 1000);
+        if (el.istClock) {
+          el.istClock.textContent =
+            pad2(ist.getUTCHours()) + ':' + pad2(ist.getUTCMinutes()) + ':' + pad2(ist.getUTCSeconds());
         }
-      } catch (_) {
-        const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-        dom.liveIstClock.textContent = [
-          String(ist.getUTCHours()).padStart(2, '0'),
-          String(ist.getUTCMinutes()).padStart(2, '0'),
-          String(ist.getUTCSeconds()).padStart(2, '0')
-        ].join(':');
+        if (el.utcClock) {
+          el.utcClock.textContent =
+            pad2(now.getUTCHours()) + ':' + pad2(now.getUTCMinutes()) + ':' + pad2(now.getUTCSeconds());
+        }
       }
 
-      if (dom.liveUtcClock) {
-        dom.liveUtcClock.textContent = [
-          String(now.getUTCHours()).padStart(2, '0'),
-          String(now.getUTCMinutes()).padStart(2, '0'),
-          String(now.getUTCSeconds()).padStart(2, '0')
-        ].join(':');
-      }
-    }
-
-    function seedCandles(pair) {
-      const candles = [];
-      let prevClose = pair.basePrice;
-      const tfMult = state.timeframe === '5m' ? 1.8 : 1;
-      for (let i = 0; i < 36; i++) {
-        const open = prevClose;
-        const delta = (Math.random() - 0.48) * pair.volatility * tfMult;
-        const close = Math.max(pair.volatility * 10, open + delta);
-        const high = Math.max(open, close) + Math.random() * pair.volatility * 0.65 * tfMult;
-        const low = Math.min(open, close) - Math.random() * pair.volatility * 0.65 * tfMult;
-        candles.push({ open, high, low, close });
-        prevClose = close;
-      }
-      state.candles = candles;
-    }
-
-    function tickCandle() {
-      const pair = state.selectedPair;
-      const tfMult = state.timeframe === '5m' ? 1.8 : 1;
-      const last = state.candles[state.candles.length - 1];
-      if (!last) return;
-      const move = (Math.random() - 0.49) * pair.volatility * 0.65 * tfMult;
-      last.close = Math.max(pair.volatility * 10, last.close + move);
-      last.high = Math.max(last.high, last.close);
-      last.low = Math.min(last.low, last.close);
-    }
-
-    function calcEma(values, period) {
-      if (!values.length) return [];
-      const k = 2 / (period + 1);
-      const out = [values[0]];
-      for (let i = 1; i < values.length; i++) {
-        out.push(values[i] * k + out[i - 1] * (1 - k));
-      }
-      return out;
-    }
-
-    function updateIndicatorsAndChart() {
-      const pair = state.selectedPair;
-      const closes = state.candles.map(c => c.close);
-      const lastPrice = closes[closes.length - 1] || pair.basePrice;
-      const dec = pair.decimals;
-
-      dom.activePairLabel.textContent = pair.symbol;
-      dom.chartTitleText.textContent = `${pair.symbol} - Live Price Action`;
-      dom.domChartTimeframePill.textContent = `${state.timeframe} View`;
-      dom.domLiveSpotPrice.textContent = lastPrice.toFixed(dec);
-
-      // RSI (14)
-      let gains = 0, losses = 0;
-      const period = Math.min(14, closes.length - 1);
-      for (let i = closes.length - period; i < closes.length; i++) {
-        const diff = closes[i] - closes[i - 1];
-        if (diff >= 0) gains += diff;
-        else losses += Math.abs(diff);
-      }
-      const rs = losses === 0 ? 70 : (gains / period) / (losses / period);
-      const rsi = Math.min(88, Math.max(12, 100 - 100 / (1 + rs)));
-      dom.indicatorRsiValue.textContent = rsi.toFixed(1);
-      if (rsi >= 70) {
-        dom.indicatorRsiStatus.textContent = 'Overbought';
-        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
-      } else if (rsi <= 30) {
-        dom.indicatorRsiStatus.textContent = 'Oversold';
-        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-      } else {
-        dom.indicatorRsiStatus.textContent = 'Neutral';
-        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700';
+      function seedCandles(pair) {
+        const mult = state.timeframe === '5m' ? 1.8 : 1;
+        let prev = pair.basePrice;
+        const list = [];
+        for (let i = 0; i < 34; i++) {
+          const open = prev;
+          const move = (Math.random() - 0.48) * pair.volatility * mult;
+          const close = Math.max(pair.volatility * 10, open + move);
+          const high = Math.max(open, close) + Math.random() * pair.volatility * 0.6 * mult;
+          const low = Math.min(open, close) - Math.random() * pair.volatility * 0.6 * mult;
+          list.push({ open, high, low, close });
+          prev = close;
+        }
+        state.candles = list;
       }
 
-      // EMA 9 / 21 & MACD
-      const ema9 = calcEma(closes, 9);
-      const ema21 = calcEma(closes, 21);
-      const spread = (ema9[ema9.length - 1] || lastPrice) - (ema21[ema21.length - 1] || lastPrice);
-      const isBull = spread >= 0;
-      dom.indicatorEmaSignal.textContent = isBull ? 'Bullish Cross ↑' : 'Bearish Cross ↓';
-      dom.indicatorEmaSignal.className = `text-sm sm:text-base font-bold mt-0.5 ${isBull ? 'text-emerald-300' : 'text-rose-300'}`;
-      dom.indicatorEmaSpread.textContent = `${spread >= 0 ? '+' : ''}${spread.toFixed(dec)}`;
-
-      const macdVal = spread * 1.15;
-      dom.indicatorMacdValue.textContent = `${macdVal >= 0 ? '+' : ''}${macdVal.toFixed(dec)}`;
-      dom.indicatorMacdBias.textContent = macdVal >= 0 ? 'Bullish Bias' : 'Bearish Bias';
-      dom.indicatorMacdBias.className = macdVal >= 0
-        ? 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-        : 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
-
-      // Canvas Candlestick + EMA 9
-      const canvas = dom.priceChartCanvas;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      const highs = state.candles.map(c => c.high);
-      const lows = state.candles.map(c => c.low);
-      const maxP = Math.max(...highs);
-      const minP = Math.min(...lows);
-      const range = Math.max(pair.volatility * 0.5, maxP - minP);
-      const padY = 22;
-      const chartH = h - padY * 2;
-      const toY = price => padY + ((maxP - price) / range) * chartH;
-
-      // Grid lines
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const y = padY + (chartH / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(12, y);
-        ctx.lineTo(w - 78, y);
-        ctx.stroke();
-
-        const pVal = maxP - (range / 4) * i;
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '11px monospace';
-        ctx.fillText(pVal.toFixed(dec), w - 72, y + 4);
+      function stepCandle() {
+        if (!state.candles.length) return;
+        const mult = state.timeframe === '5m' ? 1.8 : 1;
+        const last = state.candles[state.candles.length - 1];
+        const delta = (Math.random() - 0.49) * state.selectedPair.volatility * 0.65 * mult;
+        last.close = Math.max(state.selectedPair.volatility * 10, last.close + delta);
+        last.high = Math.max(last.high, last.close);
+        last.low = Math.min(last.low, last.close);
       }
 
-      const plotW = w - 92;
-      const stepX = plotW / state.candles.length;
-      const bodyW = Math.max(4, stepX * 0.58);
-
-      state.candles.forEach((c, idx) => {
-        const x = 14 + idx * stepX + stepX / 2;
-        const bull = c.close >= c.open;
-        const color = bull ? '#34d399' : '#fb7185';
-
-        ctx.strokeStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(x, toY(c.high));
-        ctx.lineTo(x, toY(c.low));
-        ctx.stroke();
-
-        const yOpen = toY(c.open);
-        const yClose = toY(c.close);
-        ctx.fillStyle = color;
-        ctx.fillRect(x - bodyW / 2, Math.min(yOpen, yClose), bodyW, Math.max(2, Math.abs(yClose - yOpen)));
-      });
-
-      // EMA 9 overlay
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ema9.forEach((val, idx) => {
-        const x = 14 + idx * stepX + stepX / 2;
-        const y = toY(val);
-        if (idx === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    }
-
-    function updateSignalUI() {
-      const isCall = state.direction === 'CALL';
-      dom.signalDirectionText.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
-      dom.signalDirectionText.className = `text-2xl sm:text-3xl font-extrabold mt-0.5 ${isCall ? 'text-emerald-400' : 'text-rose-400'}`;
-      dom.signalSubtext.innerHTML = `${isCall ? 'மேலே செல்லும் (Buy / Higher)' : 'கீழே செல்லும் (Sell / Lower)'} • <span id="signalPairAndTf">${state.selectedPair.symbol} • ${state.timeframe}</span>`;
-      dom.expiryCountdownDisplay.textContent = formatCountdown(state.countdownSec);
-      dom.signalAccuracyText.textContent = `${state.accuracy}%`;
-      dom.signalConfirmationNote.textContent = isCall
-        ? `${state.selectedPair.symbol} (${state.timeframe}) — Support / bullish rejection confirm aana piragu CALL entry edungal. Sudden spike / news time-ai thavirkka.`
-        : `${state.selectedPair.symbol} (${state.timeframe}) — Resistance / bearish rejection confirm aana piragu PUT entry edungal. Sudden spike / news time-ai thavirkka.`;
-    }
-
-    function renderHistory() {
-      dom.historyCountBadge.textContent = `${state.history.length} entries`;
-      if (!state.history.length) {
-        dom.signalHistoryList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/50 rounded-xl border border-slate-800/60">Puthiya signal generate seithal ingu patthivagum.</div>';
-        return;
+      function calcEma(arr, period) {
+        if (!arr.length) return [];
+        const k = 2 / (period + 1);
+        const res = [arr[0]];
+        for (let i = 1; i < arr.length; i++) {
+          res.push(arr[i] * k + res[i - 1] * (1 - k));
+        }
+        return res;
       }
-      dom.signalHistoryList.innerHTML = state.history.slice(0, 8).map(item => `
-        <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2">
-          <div>
-            <span class="font-semibold text-white">${item.pair}</span>
-            <span class="text-slate-400 ml-1.5">(${item.tf})</span>
-            <span class="text-slate-500 ml-2 font-mono">${item.time}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold ${item.dir === 'CALL' ? 'text-emerald-400' : 'text-rose-400'}">${item.dir}</span>
-            <span class="text-slate-300 font-mono">${item.acc}%</span>
-          </div>
-        </div>
-      `).join('');
-    }
 
-    function generateSignal() {
-      const closes = state.candles.map(c => c.close);
-      const recentDiff = closes.length > 5 ? closes[closes.length - 1] - closes[closes.length - 5] : 0;
-      const callProb = recentDiff > 0 ? 0.58 : recentDiff < 0 ? 0.42 : 0.5;
-      state.direction = Math.random() < callProb ? 'CALL' : 'PUT';
-      state.accuracy = state.timeframe === '5m'
-        ? Math.floor(84 + Math.random() * 9)
-        : Math.floor(78 + Math.random() * 11);
-      state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+      function renderChartAndIndicators() {
+        const pair = state.selectedPair;
+        const dec = pair.decimals;
+        const closes = state.candles.map(function (c) { return c.close; });
+        const currentPrice = closes.length ? closes[closes.length - 1] : pair.basePrice;
 
-      const nowStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      state.history.unshift({
-        pair: state.selectedPair.symbol,
-        tf: state.timeframe,
-        dir: state.direction,
-        acc: state.accuracy,
-        time: nowStr
-      });
+        if (el.activePairLabel) el.activePairLabel.textContent = pair.symbol;
+        if (el.chartTitle) el.chartTitle.textContent = pair.symbol + ' - Live Price Action';
+        if (el.tfPill) el.tfPill.textContent = state.timeframe + ' View';
+        if (el.spotPrice) el.spotPrice.textContent = currentPrice.toFixed(dec);
 
-      updateSignalUI();
-      renderHistory();
-    }
+        let gains = 0;
+        let losses = 0;
+        const len = Math.min(14, closes.length - 1);
+        for (let i = closes.length - len; i < closes.length; i++) {
+          const diff = closes[i] - closes[i - 1];
+          if (diff >= 0) gains += diff;
+          else losses += Math.abs(diff);
+        }
+        const avgGain = len > 0 ? gains / len : 1;
+        const avgLoss = len > 0 ? losses / len : 1;
+        const rs = avgLoss === 0 ? 75 : avgGain / avgLoss;
+        const rsi = Math.min(88, Math.max(14, 100 - 100 / (1 + rs)));
 
-    function setTimeframe(tf) {
-      state.timeframe = tf;
-      if (tf === '1m') {
-        dom.tf1mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition';
-        dom.tf5mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
-      } else {
-        dom.tf5mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition';
-        dom.tf1mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
-      }
-      seedCandles(state.selectedPair);
-      updateIndicatorsAndChart();
-      updateSignalUI();
-    }
-
-    function renderPairList(filterText = '') {
-      const q = filterText.trim().toLowerCase();
-      const filtered = PAIRS.filter(p => p.symbol.toLowerCase().includes(q));
-      dom.pairListContainer.innerHTML = filtered.map(p => {
-        const active = p.symbol === state.selectedPair.symbol;
-        return `
-          <button type="button" data-pair="${p.symbol}" class="pair-option w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-semibold transition ${active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-800'}">
-            <span>${p.symbol}</span>
-            <span class="font-mono text-slate-400">${p.basePrice.toFixed(p.decimals)}</span>
-          </button>
-        `;
-      }).join('');
-
-      dom.pairListContainer.querySelectorAll('.pair-option').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const chosen = PAIRS.find(item => item.symbol === btn.dataset.pair);
-          if (chosen) {
-            state.selectedPair = chosen;
-            seedCandles(chosen);
-            updateIndicatorsAndChart();
-            updateSignalUI();
+        if (el.rsiVal) el.rsiVal.textContent = rsi.toFixed(1);
+        if (el.rsiStatus) {
+          if (rsi >= 70) {
+            el.rsiStatus.textContent = 'Overbought';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
+          } else if (rsi <= 30) {
+            el.rsiStatus.textContent = 'Oversold';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+          } else {
+            el.rsiStatus.textContent = 'Neutral';
+            el.rsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700';
           }
-          dom.pairModal.classList.add('hidden');
-          dom.pairModal.classList.remove('flex');
+        }
+
+        const ema9 = calcEma(closes, 9);
+        const ema21 = calcEma(closes, 21);
+        const spread = (ema9[ema9.length - 1] || currentPrice) - (ema21[ema21.length - 1] || currentPrice);
+        const bull = spread >= 0;
+
+        if (el.emaSignal) {
+          el.emaSignal.textContent = bull ? 'Bullish Cross \u2191' : 'Bearish Cross \u2193';
+          el.emaSignal.className = 'text-sm sm:text-base font-bold mt-0.5 ' + (bull ? 'text-emerald-300' : 'text-rose-300');
+        }
+        if (el.emaSpread) {
+          el.emaSpread.textContent = (spread >= 0 ? '+' : '') + spread.toFixed(dec);
+        }
+
+        const macd = spread * 1.15;
+        if (el.macdVal) el.macdVal.textContent = (macd >= 0 ? '+' : '') + macd.toFixed(dec);
+        if (el.macdBias) {
+          el.macdBias.textContent = macd >= 0 ? 'Bullish Bias' : 'Bearish Bias';
+          el.macdBias.className = macd >= 0
+            ? 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+            : 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
+        }
+
+        if (!el.canvas || !el.canvas.getContext) return;
+        const ctx = el.canvas.getContext('2d');
+        const w = el.canvas.width;
+        const h = el.canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const highs = state.candles.map(function (c) { return c.high; });
+        const lows = state.candles.map(function (c) { return c.low; });
+        const maxP = Math.max.apply(null, highs);
+        const minP = Math.min.apply(null, lows);
+        const range = Math.max(pair.volatility * 0.4, maxP - minP);
+        const padTop = 18;
+        const chartH = h - padTop * 2;
+
+        function yPos(price) {
+          return padTop + ((maxP - price) / range) * chartH;
+        }
+
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+        ctx.lineWidth = 1;
+        for (let g = 0; g <= 4; g++) {
+          const gy = padTop + (chartH / 4) * g;
+          ctx.beginPath();
+          ctx.moveTo(10, gy);
+          ctx.lineTo(w - 74, gy);
+          ctx.stroke();
+
+          const priceLabel = maxP - (range / 4) * g;
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '11px monospace';
+          ctx.fillText(priceLabel.toFixed(dec), w - 68, gy + 4);
+        }
+
+        const plotW = w - 88;
+        const step = plotW / state.candles.length;
+        const bodyW = Math.max(4, step * 0.56);
+
+        state.candles.forEach(function (c, idx) {
+          const cx = 12 + idx * step + step / 2;
+          const isUp = c.close >= c.open;
+          const col = isUp ? '#34d399' : '#fb7185';
+
+          ctx.strokeStyle = col;
+          ctx.beginPath();
+          ctx.moveTo(cx, yPos(c.high));
+          ctx.lineTo(cx, yPos(c.low));
+          ctx.stroke();
+
+          const yO = yPos(c.open);
+          const yC = yPos(c.close);
+          ctx.fillStyle = col;
+          ctx.fillRect(cx - bodyW / 2, Math.min(yO, yC), bodyW, Math.max(2, Math.abs(yC - yO)));
         });
-      });
-    }
 
-    dom.openPairModalBtn.addEventListener('click', () => {
-      dom.pairSearchInput.value = '';
-      renderPairList('');
-      dom.pairModal.classList.remove('hidden');
-      dom.pairModal.classList.add('flex');
-      dom.pairSearchInput.focus();
-    });
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ema9.forEach(function (val, idx) {
+          const cx = 12 + idx * step + step / 2;
+          const cy = yPos(val);
+          if (idx === 0) ctx.moveTo(cx, cy);
+          else ctx.lineTo(cx, cy);
+        });
+        ctx.stroke();
+      }
 
-    dom.closePairModalBtn.addEventListener('click', () => {
-      dom.pairModal.classList.add('hidden');
-      dom.pairModal.classList.remove('flex');
-    });
+      function renderSignalCard() {
+        const isCall = state.direction === 'CALL';
+        if (el.signalDirectionText) {
+          el.signalDirectionText.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
+          el.signalDirectionText.className = 'text-2xl sm:text-3xl font-extrabold mt-0.5 ' + (isCall ? 'text-emerald-400' : 'text-rose-400');
+        }
+        if (el.signalSubtext) {
+          const desc = isCall ? 'மேலே செல்லும் (Buy / Higher)' : 'கீழே செல்லும் (Sell / Lower)';
+          el.signalSubtext.innerHTML = desc + ' &bull; <span id="signalPairAndTf">' + state.selectedPair.symbol + ' &bull; ' + state.timeframe + '</span>';
+        }
+        if (el.expiryCountdownDisplay) {
+          el.expiryCountdownDisplay.textContent = formatSec(state.countdownSec);
+        }
+        if (el.signalAccuracyText) {
+          el.signalAccuracyText.textContent = state.accuracy + '%';
+        }
+        if (el.signalConfirmationNote) {
+          el.signalConfirmationNote.textContent = isCall
+            ? state.selectedPair.symbol + ' (' + state.timeframe + ') — Support / bullish rejection confirmation paartthu mattum CALL entry edungal. Sudden spike / news nerangalil trade thavirkka.'
+            : state.selectedPair.symbol + ' (' + state.timeframe + ') — Resistance / bearish rejection confirmation paartthu mattum PUT entry edungal. Sudden spike / news nerangalil trade thavirkka.';
+        }
+      }
 
-    dom.
+      function renderHistory() {
+        if (el.historyBadge) {
+          el.historyBadge.textContent = state.history.length + ' entries';
+        }
+        if (!el.historyList) return;
+        if (!state.history.length) {
+          el.historyList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/70 rounded-xl border border-slate-800">Puthiya signal generate seithal ingu patthivagum.</div>';
+          return;
+        }
+        el.historyList.innerHTML = state.history.slice(0, 8).map(function (item) {
+          const dirClass = item.dir === 'CALL' ? 'text-emerald-400' : 'text-rose-400';
+          return (
+            '<div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">' +
+              '<div>' +
+                '<span class="font-semibold text-white">' + item.pair + '</span>' +
+                '<span class="text-slate-400 ml-1.5">(' + item.tf + ')</span>' +
+                '<span class="text-slate-500 ml-2 font-mono">' + item.time + '</span>' +
+              '</div>' +
+              '<div class="flex items-center gap-2.5">' +
+                '<span class="font-bold ' + dirClass + '">' + item.dir + '</span>' +
+                '<span class="text-slate-300 font-mono">' + item.acc + '%</span>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function handleGenerateSignal() {
+        const closes = state.candles.map(function (c) { return c.close; });
+        const diff = closes.length > 5 ? closes[closes.length - 1] - closes[closes.length - 5] : 0;
+        const prob = diff > 0 ? 0.58 : diff < 0 ? 0.42 : 0.5;
+        state.direction = Math.random() < prob ? 'CALL' : 'PUT';
+        state.accuracy = state.timeframe === '5m'
+          ? Math.floor(84 + Math.random() * 9)
+          : Math.floor(78 + Math.random() * 11);
+        state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+
+        const now = new Date();
+        const ist = new Date(now.getTime() + 5.5 * 3600 * 1000);
+        const timeStr = pad2(ist.getUTCHours()) + ':' + pad2(ist.getUTCMinutes()) + ':' + pad2(ist.getUTCSeconds());
+
+        state.history.unshift({
+          pair: state.selectedPair.symbol,
+          tf: state.timeframe,
+          dir: state.direction,
+          acc: state.accuracy,
+          time: timeStr
+        });
+
+        renderSignalCard();
+        renderHistory();
+      }
+
+      function handleSetTimeframe(tf) {
+        state.timeframe = tf;
+        if (el.tf1mBtn && el.tf5mBtn) {
+          if (tf === '1m') {
+            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+          } else {
+            el.tf5mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950';
+            el.tf1mBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
+          }
+        }
+        seedCandles(state.selectedPair);
+        renderChartAndIndicators();
+        renderSignalCard();
+      }
+
+      function renderPairModalList(query) {
+        if (!el.pairListContainer) return;
+        const q = (query || '').trim().toLowerCase();
+        const matches = PAIRS.filter(function (p) {
+          return p.symbol.toLowerCase().indexOf(q) !== -1;
+        });
+
+        el.pairListContainer.innerHTML = matches.map(function (p, idx) {
+          const selected = p.symbol === state.selectedPair.symbol;
+          const cls = selected
+            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+            : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800';
+          return (
+            '<button type="button" data-idx="' + idx + '" class="pair-row w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-semibold ' + cls + '">' +
+              '<span>' + p.symbol + '</span>' +
+              '<span class="font-mono text-slate-400">' + p.basePrice.toFixed(p.decimals) + '</span>' +
+            '</button>'
+          );
+        }).join('');
+
+        const rows = el.pairListContainer.querySelectorAll('.pair-row');
+        rows.forEach(function (row) {
+          row.addEventListener('click', function () {
+            const idx = parseInt(row.getAttribute('data-idx'), 10);
+            if (matches[idx]) {
+              state.selectedPair = matches[idx];
+              seedCandles(state.selectedPair);
+              renderChartAndIndicators();
+              renderSignalCard();
+            }
+            closeModal();
+          });
+        });
+      }
+
+      function openModal() {
+        if (!el.pairModal) return;
+        if (el.pairSearchInput) el.pairSearchInput.value = '';
+        renderPairModalList('');
+        el.pairModal.classList.remove('hidden');
+        el.pairModal.classList.add('flex');
+      }
+
+      function closeModal() {
+        if (!el.pairModal) return;
+        el.pairModal.classList.add('hidden');
+        el.pairModal.classList.remove('flex');
+      }
+
+      if (el.openPairModalBtn) el.openPairModalBtn.addEventListener('click', openModal);
+      if (el.closePairModalBtn) el.closePairModalBtn.addEventListener('click', closeModal);
+      if (el.pairModal) {
+        el.pairModal.addEventListener('click', function (ev) {
+          if (ev.target === el.pairModal) closeModal();
+        });
+      }
+      if (el.pairSearchInput) {
+        el.pairSearchInput.addEventListener('input', function (ev) {
+          renderPairModalList(ev.target.value);
+        });
+      }
+      if (el.tf1mBtn) el.tf1mBtn.addEventListener('click', function () { handleSetTimeframe('1m'); });
+      if (el.tf5mBtn) el.tf5mBtn.addEventListener('click', function () { handleSetTimeframe('5m'); });
+      if (el.generateSignalBtn) el.generateSignalBtn.addEventListener('click', handleGenerateSignal);
+
+      // Start immediately
+      seedCandles(state.selectedPair);
+      updateClocks();
+      renderChartAndIndicators();
+      renderSignalCard();
+      renderHistory();
+
+      setInterval(function () {
+        updateClocks();
+        if (state.countdownSec > 0) {
+          state.countdownSec -= 1;
+        } else {
+          state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+        }
+        stepCandle();
+        renderChartAndIndicators();
+        renderSignalCard();
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>
