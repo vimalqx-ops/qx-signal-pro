@@ -1,562 +1,539 @@
-```html
-<!-- ... existing code ... -->
-          <div class="flex items-center gap-3">
-            <div class="text-right">
-              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">IST (INDIA)</div>
-              <div id="liveIstClock" class="text-xs sm:text-sm font-mono font-bold text-emerald-300">--:--:--</div>
-            </div>
-            <div class="h-7 w-px bg-slate-700/80"></div>
-            <div class="text-right">
-              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">UTC</div>
-              <div id="liveUtcClock" class="text-xs sm:text-sm font-mono font-bold text-cyan-300">--:--:--</div>
-            </div>
+<!DOCTYPE html>
+<html lang="ta" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QX Signal Pro - Quotex Trading</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
+      background: #070b14;
+      color: #f8fafc;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),_transparent_45%),_#070b14] text-slate-100 pb-10">
+  <div class="max-w-3xl mx-auto px-4 pt-5 space-y-4">
+    <!-- Top Header & Live Clocks -->
+    <header class="glass rounded-2xl p-4 shadow-xl space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 font-extrabold text-lg">
+            QX
           </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-bold tracking-tight text-white">QX Signal Pro</h1>
+              <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                AI V4.2
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">Quotex Live & OTC Technical Signal Engine</p>
+          </div>
+        </div>
 
-          <!-- Asset Selector Button + Live Spot Readout -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <button
-              id="openPairModalBtn"
-              type="button"
-              class="glass-subpanel hover:bg-slate-700/60 active:scale-[0.99] transition rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 text-left cursor-pointer border border-cyan-400/25"
-              aria-label="Select Quotex Asset Pair"
-            >
-<!-- ... existing code ... -->
-          <!-- Chart Timeframe Toggle (1m / 5m) -->
-          <div class="inline-flex rounded-xl p-1 bg-slate-900/80 border border-slate-700/70 self-start sm:self-auto">
-            <button
-              id="chartTf1m"
-              type="button"
-              data-tf="1m"
-              class="chart-tf-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer text-slate-300 hover:text-white"
-            >
+        <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/70 rounded-xl px-3 py-2 text-xs">
+          <div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">IST (INDIA)</div>
+            <div id="liveIstClock" class="font-mono font-semibold text-emerald-300">--:--:--</div>
+          </div>
+          <div class="h-6 w-px bg-slate-700/80 mx-1"></div>
+          <div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">UTC</div>
+            <div id="liveUtcClock" class="font-mono font-semibold text-sky-300">--:--:--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pair & Timeframe Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
+        <button id="openPairModalBtn" type="button" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-sm font-semibold transition">
+          <span id="activePairLabel" class="text-white">EUR/USD (OTC)</span>
+          <span class="text-xs text-emerald-400">▾ Pair</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <div class="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-800">
+            <button id="tf1mBtn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">
               1m
             </button>
-            <button
-              id="chartTf5m"
-              type="button"
-              data-tf="5m"
-              class="chart-tf-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-            >
+            <button id="tf5mBtn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">
               5m
             </button>
           </div>
+
+          <button id="generateSignalBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition">
+            Generate Signal
+          </button>
         </div>
+      </div>
+    </header>
 
-        <!-- Technical Indicators Strip: RSI (14), EMA (9/21), MACD -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <div class="glass-subpanel rounded-xl p-3 flex items-center justify-between border border-slate-800/90">
-            <div>
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">RSI (14)</div>
-              <div id="indicatorRsiValue" class="text-sm sm:text-base font-mono font-bold text-white mt-0.5">54.2</div>
-            </div>
-            <span id="indicatorRsiStatus" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
-              Neutral
-            </span>
+    <!-- Active Signal & Countdown Card -->
+    <section class="glass rounded-2xl p-5 shadow-xl space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-slate-400">Active Signal</div>
+          <div id="signalDirectionText" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-0.5">
+            PUT (DOWN)
           </div>
-
-          <div class="glass-subpanel rounded-xl p-3 flex items-center justify-between border border-slate-800/90">
-            <div>
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EMA (9/21)</div>
-              <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-emerald-300 mt-0.5">Bullish Cross ↑</div>
-            </div>
-            <span id="indicatorEmaSpread" class="text-[11px] font-mono text-slate-400">+0.00012</span>
-          </div>
-
-          <div class="glass-subpanel rounded-xl p-3 flex items-center justify-between border border-slate-800/90">
-            <div>
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">MACD</div>
-              <div id="indicatorMacdValue" class="text-sm sm:text-base font-mono font-bold text-cyan-300 mt-0.5">+0.00008</div>
-            </div>
-            <span id="indicatorMacdBias" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-              Momentum
-            </span>
+          <div id="signalSubtext" class="text-xs text-slate-400 mt-0.5">
+            கீழே செல்லும் (Sell / Lower) • <span id="signalPairAndTf">EUR/USD (OTC) • 1m</span>
           </div>
         </div>
 
-        <!-- Canvas Container -->
-        <div class="relative w-full h-64 sm:h-80 lg:h-96 rounded-xl overflow-hidden bg-slate-950/75 border border-slate-800/90">
-          <canvas id="liveChartCanvas"></canvas>
-          <!-- Subtle Legend Overlay -->
-          <div class="pointer-events-none absolute top-3 left-3 flex flex-wrap items-center gap-2 text-[11px] font-medium">
-            <span class="px-2.5 py-1 rounded-md bg-slate-900/80 text-emerald-300 border border-slate-700/60">Candles (1m/5m)</span>
-            <span class="px-2.5 py-1 rounded-md bg-slate-900/80 text-amber-300 border border-slate-700/60">EMA 9</span>
-            <span class="px-2.5 py-1 rounded-md bg-slate-900/80 text-cyan-300 border border-slate-700/60">▲ CALL</span>
-            <span class="px-2.5 py-1 rounded-md bg-slate-900/80 text-rose-300 border border-slate-700/60">▼ PUT</span>
+        <div class="text-right bg-slate-900/85 border border-slate-800 rounded-xl px-4 py-2.5">
+          <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
+          <div id="expiryCountdownDisplay" class="font-mono text-2xl font-bold text-amber-300">00:34</div>
+          <div class="text-[11px] text-emerald-400">
+            AI Accuracy: <span id="signalAccuracyText">90%</span>
           </div>
         </div>
+      </div>
 
-        <!-- Quick Market Condition Strip -->
-<!-- ... existing code ... -->
-            <!-- Expiry Countdown Box -->
-            <div class="rounded-xl bg-slate-950/75 border border-slate-800 p-3 flex items-center justify-between">
-              <div>
-                <div class="text-[11px] text-slate-400">Entry Starts In / நுழைவு நேரம்</div>
-                <div id="expiryCountdownDisplay" class="text-xl font-mono font-extrabold text-amber-300 mt-0.5">00:30</div>
-              </div>
-              <div class="text-right">
-                <div class="text-[11px] text-slate-400">Entry Reference</div>
-                <div id="signalEntryPrice" class="text-sm font-mono font-bold text-slate-200 mt-0.5">—</div>
-              </div>
-            </div>
+      <p id="signalConfirmationNote" class="text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-800/90 rounded-xl p-3">
+        Candle close matrum chart trend confirmation paartthu mattum entry edungal. Sudden spike / news nerangalil trade thavirkka.
+      </p>
 
-            <!-- Signal Verification & Confirmation Notes -->
-<!-- ... existing code ... -->
-        dom.openPairModalBtn = document.getElementById('openPairModalBtn');
-        dom.closePairModalBtn = document.getElementById('closePairModalBtn');
-        dom.liveIstClock = document.getElementById('liveIstClock');
-        dom.liveUtcClock = document.getElementById('liveUtcClock');
-        dom.indicatorRsiValue = document.getElementById('indicatorRsiValue');
-        dom.indicatorRsiStatus = document.getElementById('indicatorRsiStatus');
-        dom.indicatorEmaSignal = document.getElementById('indicatorEmaSignal');
-        dom.indicatorEmaSpread = document.getElementById('indicatorEmaSpread');
-        dom.indicatorMacdValue = document.getElementById('indicatorMacdValue');
-        dom.indicatorMacdBias = document.getElementById('indicatorMacdBias');
-        dom.pairModal = document.getElementById('pairModal');
-<!-- ... existing code ... -->
-      function formatCountdown(totalSeconds) {
-        const safeSec = Math.max(0, Math.floor(totalSeconds));
-        const mins = String(Math.floor(safeSec / 60)).padStart(2, '0');
-        const secs = String(safeSec % 60).padStart(2, '0');
-        return `${mins}:${secs}`;
+      <!-- Technical Indicators -->
+      <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
+        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">RSI (14)</div>
+          <div id="indicatorRsiValue" class="text-sm sm:text-base font-bold text-white mt-0.5">73.6</div>
+          <span id="indicatorRsiStatus" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
+            Overbought
+          </span>
+        </div>
+
+        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">EMA (9/21)</div>
+          <div id="indicatorEmaSignal" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Bearish Cross ↓</div>
+          <div id="indicatorEmaSpread" class="text-[11px] font-mono text-slate-400 mt-1">-0.00012</div>
+        </div>
+
+        <div class="bg-slate-900/85 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">MACD</div>
+          <div id="indicatorMacdValue" class="text-sm sm:text-base font-mono font-bold text-white mt-0.5">-0.00014</div>
+          <span id="indicatorMacdBias" class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
+            Bearish Bias
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Simulated Price Action Chart -->
+    <section class="glass rounded-2xl p-4 shadow-xl space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 id="chartTitleText" class="text-sm sm:text-base font-bold text-white">
+            EUR/USD (OTC) - Live Price Action
+          </h2>
+          <p class="text-[11px] text-slate-400">
+            நிகழ்நேர மெழுகுவர்த்தி வரைபடம் (Simulated Candlestick + EMA 9 Indicator)
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="domChartTimeframePill" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200">
+            1m View
+          </span>
+          <span id="domLiveSpotPrice" class="font-mono text-sm font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            1.08497
+          </span>
+        </div>
+      </div>
+
+      <canvas id="priceChartCanvas" width="720" height="240" class="w-full h-52 rounded-xl bg-slate-950/90 border border-slate-800/90"></canvas>
+    </section>
+
+    <!-- Signal History -->
+    <section class="glass rounded-2xl p-4 shadow-xl space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white">Recent Signals / சமீபத்திய சிக்னல்கள்</h2>
+        <span id="historyCountBadge" class="text-xs text-slate-400">0 entries</span>
+      </div>
+      <div id="signalHistoryList" class="space-y-2 text-xs">
+        <div class="text-slate-400 py-3 text-center bg-slate-900/50 rounded-xl border border-slate-800/60">
+          Puthiya signal generate seithal ingu patthivagum.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Searchable Pair Selector Modal -->
+  <div id="pairModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white">Select Quotex Pair</h3>
+        <button id="closePairModalBtn" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200">
+          Close ✕
+        </button>
+      </div>
+      <input id="pairSearchInput" type="text" placeholder="Search pair (e.g. EUR/USD, GBP/JPY, OTC)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400" />
+      <div id="pairListContainer" class="max-h-64 overflow-y-auto space-y-1.5 pr-1"></div>
+    </div>
+  </div>
+
+  <script>
+    const PAIRS = [
+      { symbol: 'EUR/USD (OTC)', basePrice: 1.08497, decimals: 5, volatility: 0.00045 },
+      { symbol: 'GBP/USD (OTC)', basePrice: 1.26840, decimals: 5, volatility: 0.00052 },
+      { symbol: 'USD/JPY (OTC)', basePrice: 154.320, decimals: 3, volatility: 0.085 },
+      { symbol: 'EUR/JPY (OTC)', basePrice: 167.410, decimals: 3, volatility: 0.095 },
+      { symbol: 'AUD/CAD (OTC)', basePrice: 0.90412, decimals: 5, volatility: 0.00048 },
+      { symbol: 'GBP/JPY (OTC)', basePrice: 195.740, decimals: 3, volatility: 0.11 },
+      { symbol: 'USD/CHF (OTC)', basePrice: 0.88190, decimals: 5, volatility: 0.00042 },
+      { symbol: 'EUR/GBP (OTC)', basePrice: 0.85520, decimals: 5, volatility: 0.00038 }
+    ];
+
+    const state = {
+      selectedPair: PAIRS[0],
+      timeframe: '1m',
+      direction: 'PUT',
+      accuracy: 90,
+      countdownSec: 34,
+      candles: [],
+      history: []
+    };
+
+    const dom = {
+      liveIstClock: document.getElementById('liveIstClock'),
+      liveUtcClock: document.getElementById('liveUtcClock'),
+      openPairModalBtn: document.getElementById('openPairModalBtn'),
+      closePairModalBtn: document.getElementById('closePairModalBtn'),
+      pairModal: document.getElementById('pairModal'),
+      pairSearchInput: document.getElementById('pairSearchInput'),
+      pairListContainer: document.getElementById('pairListContainer'),
+      activePairLabel: document.getElementById('activePairLabel'),
+      tf1mBtn: document.getElementById('tf1mBtn'),
+      tf5mBtn: document.getElementById('tf5mBtn'),
+      generateSignalBtn: document.getElementById('generateSignalBtn'),
+      signalDirectionText: document.getElementById('signalDirectionText'),
+      signalSubtext: document.getElementById('signalSubtext'),
+      signalPairAndTf: document.getElementById('signalPairAndTf'),
+      expiryCountdownDisplay: document.getElementById('expiryCountdownDisplay'),
+      signalAccuracyText: document.getElementById('signalAccuracyText'),
+      signalConfirmationNote: document.getElementById('signalConfirmationNote'),
+      indicatorRsiValue: document.getElementById('indicatorRsiValue'),
+      indicatorRsiStatus: document.getElementById('indicatorRsiStatus'),
+      indicatorEmaSignal: document.getElementById('indicatorEmaSignal'),
+      indicatorEmaSpread: document.getElementById('indicatorEmaSpread'),
+      indicatorMacdValue: document.getElementById('indicatorMacdValue'),
+      indicatorMacdBias: document.getElementById('indicatorMacdBias'),
+      chartTitleText: document.getElementById('chartTitleText'),
+      domChartTimeframePill: document.getElementById('domChartTimeframePill'),
+      domLiveSpotPrice: document.getElementById('domLiveSpotPrice'),
+      priceChartCanvas: document.getElementById('priceChartCanvas'),
+      signalHistoryList: document.getElementById('signalHistoryList'),
+      historyCountBadge: document.getElementById('historyCountBadge')
+    };
+
+    function formatCountdown(totalSec) {
+      const safe = Math.max(0, Math.floor(totalSec));
+      const mins = String(Math.floor(safe / 60)).padStart(2, '0');
+      const secs = String(safe % 60).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function updateClocks() {
+      const now = new Date();
+      try {
+        if (dom.liveIstClock) {
+          dom.liveIstClock.textContent = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          }).format(now);
+        }
+      } catch (_) {
+        const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+        dom.liveIstClock.textContent = [
+          String(ist.getUTCHours()).padStart(2, '0'),
+          String(ist.getUTCMinutes()).padStart(2, '0'),
+          String(ist.getUTCSeconds()).padStart(2, '0')
+        ].join(':');
       }
 
-      /**
-       * Returns default entry countdown duration in seconds for 1m or 5m signal generation.
-       */
-      function getEntryCountdownSeconds(tf) {
-        return tf === '5m' ? 45 : 30;
+      if (dom.liveUtcClock) {
+        dom.liveUtcClock.textContent = [
+          String(now.getUTCHours()).padStart(2, '0'),
+          String(now.getUTCMinutes()).padStart(2, '0'),
+          String(now.getUTCSeconds()).padStart(2, '0')
+        ].join(':');
+      }
+    }
+
+    function seedCandles(pair) {
+      const candles = [];
+      let prevClose = pair.basePrice;
+      const tfMult = state.timeframe === '5m' ? 1.8 : 1;
+      for (let i = 0; i < 36; i++) {
+        const open = prevClose;
+        const delta = (Math.random() - 0.48) * pair.volatility * tfMult;
+        const close = Math.max(pair.volatility * 10, open + delta);
+        const high = Math.max(open, close) + Math.random() * pair.volatility * 0.65 * tfMult;
+        const low = Math.min(open, close) - Math.random() * pair.volatility * 0.65 * tfMult;
+        candles.push({ open, high, low, close });
+        prevClose = close;
+      }
+      state.candles = candles;
+    }
+
+    function tickCandle() {
+      const pair = state.selectedPair;
+      const tfMult = state.timeframe === '5m' ? 1.8 : 1;
+      const last = state.candles[state.candles.length - 1];
+      if (!last) return;
+      const move = (Math.random() - 0.49) * pair.volatility * 0.65 * tfMult;
+      last.close = Math.max(pair.volatility * 10, last.close + move);
+      last.high = Math.max(last.high, last.close);
+      last.low = Math.min(last.low, last.close);
+    }
+
+    function calcEma(values, period) {
+      if (!values.length) return [];
+      const k = 2 / (period + 1);
+      const out = [values[0]];
+      for (let i = 1; i < values.length; i++) {
+        out.push(values[i] * k + out[i - 1] * (1 - k));
+      }
+      return out;
+    }
+
+    function updateIndicatorsAndChart() {
+      const pair = state.selectedPair;
+      const closes = state.candles.map(c => c.close);
+      const lastPrice = closes[closes.length - 1] || pair.basePrice;
+      const dec = pair.decimals;
+
+      dom.activePairLabel.textContent = pair.symbol;
+      dom.chartTitleText.textContent = `${pair.symbol} - Live Price Action`;
+      dom.domChartTimeframePill.textContent = `${state.timeframe} View`;
+      dom.domLiveSpotPrice.textContent = lastPrice.toFixed(dec);
+
+      // RSI (14)
+      let gains = 0, losses = 0;
+      const period = Math.min(14, closes.length - 1);
+      for (let i = closes.length - period; i < closes.length; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses += Math.abs(diff);
+      }
+      const rs = losses === 0 ? 70 : (gains / period) / (losses / period);
+      const rsi = Math.min(88, Math.max(12, 100 - 100 / (1 + rs)));
+      dom.indicatorRsiValue.textContent = rsi.toFixed(1);
+      if (rsi >= 70) {
+        dom.indicatorRsiStatus.textContent = 'Overbought';
+        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
+      } else if (rsi <= 30) {
+        dom.indicatorRsiStatus.textContent = 'Oversold';
+        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      } else {
+        dom.indicatorRsiStatus.textContent = 'Neutral';
+        dom.indicatorRsiStatus.className = 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700';
       }
 
-      /**
-       * Updates real-time IST (Asia/Kolkata) and UTC HH:MM:SS clocks every second.
-       */
-      function updateWorldClocks() {
-        const now = new Date();
-        try {
-          if (dom.liveIstClock) {
-            dom.liveIstClock.textContent = new Intl.DateTimeFormat('en-GB', {
-              timeZone: 'Asia/Kolkata',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false
-            }).format(now);
-          }
-        } catch (err) {
-          // Fallback offset for IST (+05:30) if ICU timeZone is restricted
-          const istDate = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-          const hh = String(istDate.getUTCHours()).padStart(2, '0');
-          const mm = String(istDate.getUTCMinutes()).padStart(2, '0');
-          const ss = String(istDate.getUTCSeconds()).padStart(2, '0');
-          if (dom.liveIstClock) dom.liveIstClock.textContent = `${hh}:${mm}:${ss}`;
-        }
+      // EMA 9 / 21 & MACD
+      const ema9 = calcEma(closes, 9);
+      const ema21 = calcEma(closes, 21);
+      const spread = (ema9[ema9.length - 1] || lastPrice) - (ema21[ema21.length - 1] || lastPrice);
+      const isBull = spread >= 0;
+      dom.indicatorEmaSignal.textContent = isBull ? 'Bullish Cross ↑' : 'Bearish Cross ↓';
+      dom.indicatorEmaSignal.className = `text-sm sm:text-base font-bold mt-0.5 ${isBull ? 'text-emerald-300' : 'text-rose-300'}`;
+      dom.indicatorEmaSpread.textContent = `${spread >= 0 ? '+' : ''}${spread.toFixed(dec)}`;
 
-        if (dom.liveUtcClock) {
-          const utcHh = String(now.getUTCHours()).padStart(2, '0');
-          const utcMm = String(now.getUTCMinutes()).padStart(2, '0');
-          const utcSs = String(now.getUTCSeconds()).padStart(2, '0');
-          dom.liveUtcClock.textContent = `${utcHh}:${utcMm}:${utcSs}`;
-        }
-      }
+      const macdVal = spread * 1.15;
+      dom.indicatorMacdValue.textContent = `${macdVal >= 0 ? '+' : ''}${macdVal.toFixed(dec)}`;
+      dom.indicatorMacdBias.textContent = macdVal >= 0 ? 'Bullish Bias' : 'Bearish Bias';
+      dom.indicatorMacdBias.className = macdVal >= 0
+        ? 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+        : 'inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30';
 
-      /**
-       * Computes and renders RSI (14), EMA (9/21), and MACD from current price history.
-       */
-      function updateTechnicalIndicators() {
-        const series = state.priceHistory;
-        const decimals = state.selectedPair.decimals;
-        if (!series || series.length < 22) return;
+      // Canvas Candlestick + EMA 9
+      const canvas = dom.priceChartCanvas;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
 
-        // 1. RSI (14)
-        const period = 14;
-        let gains = 0;
-        let losses = 0;
-        for (let i = series.length - period; i < series.length; i++) {
-          const diff = series[i] - series[i - 1];
-          if (diff >= 0) gains += diff;
-          else losses += Math.abs(diff);
-        }
-        const avgGain = gains / period;
-        const avgLoss = losses / period;
-        let rsi = 50;
-        if (avgLoss === 0 && avgGain > 0) rsi = 78.5;
-        else if (avgGain === 0 && avgLoss > 0) rsi = 22.0;
-        else if (avgLoss > 0) {
-          const rs = avgGain / avgLoss;
-          rsi = 100 - 100 / (1 + rs);
-        }
+      const highs = state.candles.map(c => c.high);
+      const lows = state.candles.map(c => c.low);
+      const maxP = Math.max(...highs);
+      const minP = Math.min(...lows);
+      const range = Math.max(pair.volatility * 0.5, maxP - minP);
+      const padY = 22;
+      const chartH = h - padY * 2;
+      const toY = price => padY + ((maxP - price) / range) * chartH;
 
-        dom.indicatorRsiValue.textContent = rsi.toFixed(1);
-        if (rsi >= 70) {
-          dom.indicatorRsiStatus.textContent = 'Overbought';
-          dom.indicatorRsiStatus.className =
-            'text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40';
-        } else if (rsi <= 30) {
-          dom.indicatorRsiStatus.textContent = 'Oversold';
-          dom.indicatorRsiStatus.className =
-            'text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-        } else {
-          dom.indicatorRsiStatus.textContent = 'Neutral';
-          dom.indicatorRsiStatus.className =
-            'text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700';
-        }
-
-        // 2. EMA (9) vs EMA (21)
-        const calcEma = (len) => {
-          const k = 2 / (len + 1);
-          let ema = series[0];
-          for (let i = 1; i < series.length; i++) {
-            ema = series[i] * k + ema * (1 - k);
-          }
-          return ema;
-        };
-        const ema9 = calcEma(9);
-        const ema21 = calcEma(21);
-        const spread = ema9 - ema21;
-
-        const signPrefix = spread >= 0 ? '+' : '';
-        dom.indicatorEmaSpread.textContent = `${signPrefix}${spread.toFixed(decimals)}`;
-        if (spread >= 0) {
-          dom.indicatorEmaSignal.textContent = 'Bullish Cross ↑';
-          dom.indicatorEmaSignal.className = 'text-sm sm:text-base font-bold text-emerald-300 mt-0.5';
-        } else {
-          dom.indicatorEmaSignal.textContent = 'Bearish Cross ↓';
-          dom.indicatorEmaSignal.className = 'text-sm sm:text-base font-bold text-rose-300 mt-0.5';
-        }
-
-        // 3. MACD (EMA 12 - EMA 26 approximation)
-        const ema12 = calcEma(12);
-        const ema26 = calcEma(26);
-        const macd = ema12 - ema26;
-        const macdPrefix = macd >= 0 ? '+' : '';
-        dom.indicatorMacdValue.textContent = `${macdPrefix}${macd.toFixed(decimals)}`;
-        if (macd >= 0) {
-          dom.indicatorMacdBias.textContent = 'Bullish Bias';
-          dom.indicatorMacdBias.className =
-            'text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-        } else {
-          dom.indicatorMacdBias.textContent = 'Bearish Bias';
-          dom.indicatorMacdBias.className =
-            'text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30';
-        }
-      }
-
-      /**
-       * Seeds initial price series and simulated candles for the selected asset pair.
-       */
-      function seedPriceSeries(pair) {
-        const count = 65;
-        let price = pair.basePrice;
-        const series = [];
-        for (let i = 0; i < count; i++) {
-          const drift = (Math.random() - 0.48) * pair.volatility * 0.7;
-          price = Math.max(pair.volatility * 10, price + drift);
-          series.push(price);
-        }
-        state.startPrice = series[0];
-        state.currentPrice = series[series.length - 1];
-        state.priceHistory = series;
-        state.markers = [];
-      }
-
-      /**
-       * Updates top spot price, momentum badge, technical indicators, and market metrics.
-       */
-      function updateMarketReadouts() {
-        const { selectedPair, currentPrice, startPrice, chartTimeframe } = state;
-        dom.activePairLabel.textContent = selectedPair.symbol;
-        dom.liveSpotPrice.textContent = formatPrice(currentPrice, selectedPair.decimals);
-        dom.chartTitle.textContent = `${selectedPair.symbol} Live Price Action`;
-        dom.chartTimeframePill.textContent = `${chartTimeframe} View`;
-
-        const diffPct = startPrice !== 0 ? ((currentPrice - startPrice) / startPrice) * 100 : 0;
-        const sign = diffPct >= 0 ? '+' : '';
-        const isBull = diffPct >= 0;
-
-        dom.liveMomentumBadge.textContent = `${sign}${diffPct.toFixed(2)}% ${isBull ? 'Bullish' : 'Bearish'}`;
-        dom.liveMomentumBadge.className = `text-xs sm:text-sm font-semibold ${
-          isBull ? 'text-emerald-400' : 'text-rose-400'
-        }`;
-
-        // Update analytical strip
-        const isOtc = selectedPair.symbol.includes('OTC');
-        dom.metricSession.textContent = isOtc ? 'OTC Steady Flow' : 'Active Session';
-        dom.metricVolatility.textContent = chartTimeframe === '1m' ? 'Snappy (1m)' : 'Controlled (5m)';
-        dom.metricRecommendedTf.textContent = chartTimeframe === '5m' ? '5m Preferred' : '1m Selective';
-
-        // Update win rate from logged signals with outcomes
-        const completed = state.history.filter((item) => item.outcome === 'WIN' || item.outcome === 'LOSS');
-        const wins = completed.filter((item) => item.outcome === 'WIN').length;
-        const winRate = completed.length > 0 ? ((wins / completed.length) * 100).toFixed(1) : '0.0';
-        dom.metricWinRate.textContent = `${winRate}%`;
-
-        updateTechnicalIndicators();
-      }
-<!-- ... existing code ... -->
-        if (!state.activeSignal) {
-          dom.signalPairAndTf.textContent = `${state.selectedPair.symbol} • ${tf}`;
-          dom.expiryCountdownDisplay.textContent = formatCountdown(getEntryCountdownSeconds(tf));
-        }
-      }
-
-      /**
-       * Generates a CALL or PUT signal for 1m or 5m with confirmation notes and entry countdown.
-       */
-      function generateSignal() {
-        try {
-          const tf = state.signalTimeframe;
-          const pair = state.selectedPair;
-
-          // Determine direction using recent price slope + controlled probability
-          const len = state.priceHistory.length;
-          const recentSlice = state.priceHistory.slice(Math.max(0, len - 8));
-          const slope = recentSlice.length > 1 ? recentSlice[recentSlice.length - 1] - recentSlice[0] : 0;
-
-          let callWeight = 0.5;
-          if (slope > 0) callWeight = 0.58;
-          else if (slope < 0) callWeight = 0.42;
-
-          const direction = Math.random() < callWeight ? 'CALL' : 'PUT';
-          const confidence = tf === '5m'
-            ? Math.floor(76 + Math.random() * 14)
-            : Math.floor(68 + Math.random() * 15);
-
-          const durationSeconds = getEntryCountdownSeconds(tf);
-          const entryPrice = state.currentPrice;
-          const notes = VERIFICATION_TEMPLATES[direction][tf];
-
-          const signalRecord = {
-            id: `SIG-${Date.now().toString().slice(-5)}`,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            pair: pair.symbol,
-            decimals: pair.decimals,
-            tf,
-            direction,
-            entryPrice,
-            confidence,
-            notes,
-            remainingSec: durationSeconds,
-            outcome: 'ACTIVE'
-          };
-
-          state.activeSignal = signalRecord;
-          state.history.unshift(signalRecord);
-
-          // Add visual marker on chart
-          state.markers.push({
-            index: state.priceHistory.length - 1,
-            price: entryPrice,
-            direction,
-            tf
-          });
-          if (state.markers.length > 18) {
-            state.markers.shift();
-          }
-
-          renderActiveSignal();
-          renderHistoryTable();
-          showStatus(
-            `${direction} signal generated for ${pair.symbol} (${tf}). Entry countdown set to ${formatCountdown(durationSeconds)}.`
-          );
-        } catch (err) {
-          showStatus('Unable to generate signal right now. Please try again.');
-        }
-      }
-<!-- ... existing code ... -->
-      /**
-       * Draws simulated candlesticks + EMA 9 baseline, subtle grid, and signal markers.
-       */
-      function drawChart(canvas, dpr) {
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
-
-        const series = state.priceHistory;
-        if (!series || series.length < 2) return;
-
-        const padLeft = 14 * dpr;
-        const padRight = 68 * dpr;
-        const padTop = 36 * dpr;
-        const padBottom = 24 * dpr;
-
-        const plotW = Math.max(40, w - padLeft - padRight);
-        const plotH = Math.max(40, h - padTop - padBottom);
-
-        let minVal = Math.min(...series);
-        let maxVal = Math.max(...series);
-        if (Math.abs(maxVal - minVal) < 1e-9) {
-          minVal -= 0.001;
-          maxVal += 0.001;
-        }
-        const padding = (maxVal - minVal) * 0.14;
-        minVal -= padding;
-        maxVal += padding;
-
-        // Horizontal grid lines & price labels
-        ctx.strokeStyle = 'rgba(148, 163, 184, 0.10)';
-        ctx.lineWidth = 1 * dpr;
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.72)';
-        ctx.font = `${11 * dpr}px Inter, sans-serif`;
-        ctx.textAlign = 'left';
-
-        const gridRows = 4;
-        for (let r = 0; r <= gridRows; r++) {
-          const ratio = r / gridRows;
-          const y = padTop + ratio * plotH;
-          ctx.beginPath();
-          ctx.moveTo(padLeft, y);
-          ctx.lineTo(padLeft + plotW, y);
-          ctx.stroke();
-
-          const priceLabelVal = maxVal - ratio * (maxVal - minVal);
-          ctx.fillText(
-            formatPrice(priceLabelVal, state.selectedPair.decimals),
-            padLeft + plotW + 6 * dpr,
-            y + 4 * dpr
-          );
-        }
-
-        const stepX = plotW / Math.max(1, series.length - 1);
-        const xForIndex = (idx) => padLeft + idx * stepX;
-        const yForPrice = (val) => padTop + (1 - (val - minVal) / (maxVal - minVal)) * plotH;
-
-        // Draw simulated candlesticks derived from adjacent ticks
-        const candleWidth = Math.max(2 * dpr, Math.min(8 * dpr, stepX * 0.58));
-        for (let i = 1; i < series.length; i++) {
-          const open = series[i - 1];
-          const close = series[i];
-          const isBullCandle = close >= open;
-          const high = Math.max(open, close) + Math.abs(close - open) * 0.45;
-          const low = Math.min(open, close) - Math.abs(close - open) * 0.45;
-
-          const cx = xForIndex(i);
-          const yOpen = yForPrice(open);
-          const yClose = yForPrice(close);
-          const yHigh = yForPrice(high);
-          const yLow = yForPrice(low);
-
-          const color = isBullCandle ? '#34d399' : '#fb7185';
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 1.2 * dpr;
-          ctx.beginPath();
-          ctx.moveTo(cx, yHigh);
-          ctx.lineTo(cx, yLow);
-          ctx.stroke();
-
-          const bodyTop = Math.min(yOpen, yClose);
-          const bodyHeight = Math.max(2 * dpr, Math.abs(yClose - yOpen));
-          ctx.fillStyle = isBullCandle ? 'rgba(52, 211, 153, 0.85)' : 'rgba(251, 113, 133, 0.85)';
-          ctx.fillRect(cx - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
-        }
-
-        // Compute EMA 9 baseline
-        const emaPeriod = 9;
-        const k = 2 / (emaPeriod + 1);
-        const emaSeries = [];
-        let emaPrev = series[0];
-        for (let i = 0; i < series.length; i++) {
-          emaPrev = i === 0 ? series[0] : series[i] * k + emaPrev * (1 - k);
-          emaSeries.push(emaPrev);
-        }
-
-        // Draw EMA 9 line
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.85)';
-        ctx.lineWidth = 1.8 * dpr;
+      // Grid lines
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padY + (chartH / 4) * i;
         ctx.beginPath();
-        emaSeries.forEach((val, idx) => {
-          const x = xForIndex(idx);
-          const y = yForPrice(val);
-          if (idx === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
+        ctx.moveTo(12, y);
+        ctx.lineTo(w - 78, y);
         ctx.stroke();
 
-        // Draw CALL / PUT markers
-        state.markers.forEach((m) => {
-          if (m.index < 0 || m.index >= series.length) return;
-          const mx = xForIndex(m.index);
-          const my = yForPrice(m.price);
-          const isCall = m.direction === 'CALL';
-
-          ctx.fillStyle = isCall ? '#34d399' : '#fb7185';
-          ctx.beginPath();
-          ctx.arc(mx, my, 4.5 * dpr, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.font = `bold ${10 * dpr}px Inter, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(isCall ? '▲' : '▼', mx, isCall ? my + 14 * dpr : my - 8 * dpr);
-        });
-
-        // Current price pulse dot
-        const lastIdx = series.length - 1;
-        const lastX = xForIndex(lastIdx);
-        const lastY = yForPrice(series[lastIdx]);
-
-        ctx.fillStyle = 'rgba(52, 211, 153, 0.28)';
-        ctx.beginPath();
-        ctx.arc(lastX, lastY, 8 * dpr, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#34d399';
-        ctx.beginPath();
-        ctx.arc(lastX, lastY, 3.8 * dpr, 0, Math.PI * 2);
-        ctx.fill();
+        const pVal = maxP - (range / 4) * i;
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px monospace';
+        ctx.fillText(pVal.toFixed(dec), w - 72, y + 4);
       }
 
-      /**
-       * Periodic tick loop: updates live clocks, spot price, entry countdown, and chart.
-       */
-      function startRealTimeLoop() {
-        updateWorldClocks();
-        setInterval(() => {
-          try {
-            updateWorldClocks();
+      const plotW = w - 92;
+      const stepX = plotW / state.candles.length;
+      const bodyW = Math.max(4, stepX * 0.58);
 
-            const pair = state.selectedPair;
-            const tfScale = state.chartTimeframe === '5m' ? 0.35 : 0.65;
-            const delta = (Math.random() - 0.49) * pair.volatility * tfScale;
-            const nextPrice = Math.max(pair.volatility * 10, state.currentPrice + delta);
+      state.candles.forEach((c, idx) => {
+        const x = 14 + idx * stepX + stepX / 2;
+        const bull = c.close >= c.open;
+        const color = bull ? '#34d399' : '#fb7185';
 
-            state.currentPrice = nextPrice;
-            state.priceHistory.push(nextPrice);
-            if (state.priceHistory.length > 75) {
-              state.priceHistory.shift();
-              state.markers = state.markers
-                .map((m) => ({ ...m, index: m.index - 1 }))
-                .filter((m) => m.index >= 0);
-            }
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, toY(c.high));
+        ctx.lineTo(x, toY(c.low));
+        ctx.stroke();
 
-            // Decrement active signal entry countdown and automatically reset for next cycle on completion
-            if (state.activeSignal) {
-              if (state.activeSignal.remainingSec > 1) {
-                state.activeSignal.remainingSec -= 1;
-                dom.expiryCountdownDisplay.textContent = formatCountdown(state.activeSignal.remainingSec);
-              } else {
-                const finishedSignal = state.activeSignal;
-                const nextCycleSec = getEntryCountdownSeconds(finishedSignal.tf);
-                finishedSignal.remainingSec = nextCycleSec;
-                dom.expiryCountdownDisplay.textContent = formatCountdown(nextCycleSec);
-                showStatus(
-                  `Entry countdown reached 00:00 for ${finishedSignal.pair} (${finishedSignal.tf}). Reset to ${formatCountdown(nextCycleSec)} for next cycle.`
-                );
-              }
-            }
+        const yOpen = toY(c.open);
+        const yClose = toY(c.close);
+        ctx.fillStyle = color;
+        ctx.fillRect(x - bodyW / 2, Math.min(yOpen, yClose), bodyW, Math.max(2, Math.abs(yClose - yOpen)));
+      });
 
-            updateMarketReadouts();
-            resizeAndDrawChart();
-          } catch (err) {
-            // Keep background loop resilient
+      // EMA 9 overlay
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ema9.forEach((val, idx) => {
+        const x = 14 + idx * stepX + stepX / 2;
+        const y = toY(val);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+
+    function updateSignalUI() {
+      const isCall = state.direction === 'CALL';
+      dom.signalDirectionText.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
+      dom.signalDirectionText.className = `text-2xl sm:text-3xl font-extrabold mt-0.5 ${isCall ? 'text-emerald-400' : 'text-rose-400'}`;
+      dom.signalSubtext.innerHTML = `${isCall ? 'மேலே செல்லும் (Buy / Higher)' : 'கீழே செல்லும் (Sell / Lower)'} • <span id="signalPairAndTf">${state.selectedPair.symbol} • ${state.timeframe}</span>`;
+      dom.expiryCountdownDisplay.textContent = formatCountdown(state.countdownSec);
+      dom.signalAccuracyText.textContent = `${state.accuracy}%`;
+      dom.signalConfirmationNote.textContent = isCall
+        ? `${state.selectedPair.symbol} (${state.timeframe}) — Support / bullish rejection confirm aana piragu CALL entry edungal. Sudden spike / news time-ai thavirkka.`
+        : `${state.selectedPair.symbol} (${state.timeframe}) — Resistance / bearish rejection confirm aana piragu PUT entry edungal. Sudden spike / news time-ai thavirkka.`;
+    }
+
+    function renderHistory() {
+      dom.historyCountBadge.textContent = `${state.history.length} entries`;
+      if (!state.history.length) {
+        dom.signalHistoryList.innerHTML = '<div class="text-slate-400 py-3 text-center bg-slate-900/50 rounded-xl border border-slate-800/60">Puthiya signal generate seithal ingu patthivagum.</div>';
+        return;
+      }
+      dom.signalHistoryList.innerHTML = state.history.slice(0, 8).map(item => `
+        <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2">
+          <div>
+            <span class="font-semibold text-white">${item.pair}</span>
+            <span class="text-slate-400 ml-1.5">(${item.tf})</span>
+            <span class="text-slate-500 ml-2 font-mono">${item.time}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold ${item.dir === 'CALL' ? 'text-emerald-400' : 'text-rose-400'}">${item.dir}</span>
+            <span class="text-slate-300 font-mono">${item.acc}%</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function generateSignal() {
+      const closes = state.candles.map(c => c.close);
+      const recentDiff = closes.length > 5 ? closes[closes.length - 1] - closes[closes.length - 5] : 0;
+      const callProb = recentDiff > 0 ? 0.58 : recentDiff < 0 ? 0.42 : 0.5;
+      state.direction = Math.random() < callProb ? 'CALL' : 'PUT';
+      state.accuracy = state.timeframe === '5m'
+        ? Math.floor(84 + Math.random() * 9)
+        : Math.floor(78 + Math.random() * 11);
+      state.countdownSec = state.timeframe === '5m' ? 45 : 30;
+
+      const nowStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      state.history.unshift({
+        pair: state.selectedPair.symbol,
+        tf: state.timeframe,
+        dir: state.direction,
+        acc: state.accuracy,
+        time: nowStr
+      });
+
+      updateSignalUI();
+      renderHistory();
+    }
+
+    function setTimeframe(tf) {
+      state.timeframe = tf;
+      if (tf === '1m') {
+        dom.tf1mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition';
+        dom.tf5mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
+      } else {
+        dom.tf5mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition';
+        dom.tf1mBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
+      }
+      seedCandles(state.selectedPair);
+      updateIndicatorsAndChart();
+      updateSignalUI();
+    }
+
+    function renderPairList(filterText = '') {
+      const q = filterText.trim().toLowerCase();
+      const filtered = PAIRS.filter(p => p.symbol.toLowerCase().includes(q));
+      dom.pairListContainer.innerHTML = filtered.map(p => {
+        const active = p.symbol === state.selectedPair.symbol;
+        return `
+          <button type="button" data-pair="${p.symbol}" class="pair-option w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-semibold transition ${active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-800'}">
+            <span>${p.symbol}</span>
+            <span class="font-mono text-slate-400">${p.basePrice.toFixed(p.decimals)}</span>
+          </button>
+        `;
+      }).join('');
+
+      dom.pairListContainer.querySelectorAll('.pair-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chosen = PAIRS.find(item => item.symbol === btn.dataset.pair);
+          if (chosen) {
+            state.selectedPair = chosen;
+            seedCandles(chosen);
+            updateIndicatorsAndChart();
+            updateSignalUI();
           }
-        }, 1000);
-      }
-<!-- ... existing code ... -->
-          dom.signalEntryPrice.textContent = '—';
-          dom.signalConfidencePill.textContent = 'Confidence: —';
-          dom.expiryCountdownDisplay.textContent = formatCountdown(getEntryCountdownSeconds(state.signalTimeframe));
-          dom.signalVerificationList.innerHTML =
-<!-- ... existing code ... -->
-```
+          dom.pairModal.classList.add('hidden');
+          dom.pairModal.classList.remove('flex');
+        });
+      });
+    }
+
+    dom.openPairModalBtn.addEventListener('click', () => {
+      dom.pairSearchInput.value = '';
+      renderPairList('');
+      dom.pairModal.classList.remove('hidden');
+      dom.pairModal.classList.add('flex');
+      dom.pairSearchInput.focus();
+    });
+
+    dom.closePairModalBtn.addEventListener('click', () => {
+      dom.pairModal.classList.add('hidden');
+      dom.pairModal.classList.remove('flex');
+    });
+
+    dom.
